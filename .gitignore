@@ -1,0 +1,3 @@
+.venv
+.vscode
+backend/fetch/json_cards.json
