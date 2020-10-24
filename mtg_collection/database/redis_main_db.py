@@ -2,7 +2,7 @@ import sys
 import json
 from pathlib import Path
 from redis import Redis
-from models import Card
+from .models import Card
 
 
 class RedisMainSync():
@@ -70,17 +70,13 @@ class RedisMainSync():
             if card is None:
                 continue
             self.write_card(card)
+        self.redis.bgsave()
         print('done')
 
     def write_card(self, card):
         """Write card from json to database.
         """
         self.redis.set(card.key, card.value)
-
-
-if __name__ == '__main__':
-    sync = RedisMainSync(host='localhost', port=6379, db=0)
-    sync.init_db()
 
 
 #  Redis structure
