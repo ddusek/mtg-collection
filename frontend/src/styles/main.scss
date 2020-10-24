@@ -1,0 +1,37 @@
+@import './_variables';
+@import './layout';
+
+@font-face {
+    font-family: 'Vinson';
+    src: url('../fonts/VInson-Regular.ttf') format('truetype');
+    font-weight: 600;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Vinson-Bold';
+    src: url('../fonts/Vinson-Bold.ttf') format('truetype');
+    font-weight: 800;
+    font-style: bold;
+}
+@font-face {
+    font-family: 'Vinson-Light';
+    src: url('../fonts/Vinson-Light.ttf') format('truetype');
+    font-weight: 200;
+    font-style: normal;
+}
+
+html {
+    font-family: Vinson, Arial, Helvetica, sans-serif;
+    height: 100%;
+    background-color: rgb(85, 85, 85);
+    color: $base-text-color;
+}
+
+body {
+    margin: 0;
+}
+
+a {
+    color: $base-text-color;
+    text-decoration: none;
+}

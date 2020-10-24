@@ -3,5 +3,7 @@
 __pycache__
 *.rdb
 *.pid
+node_modules
+dist
 mtg_collection/fetch/*.json
 backend/fetch/json_cards.json
