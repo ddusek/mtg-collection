@@ -1,3 +1,7 @@
 .venv
 .vscode
+__pycache__
+*.rdb
+*.pid
+mtg_collection/fetch/*.json
 backend/fetch/json_cards.json
