@@ -1,12 +1,13 @@
 <template>
     <div class="container">
         <h2>Add card to collection</h2>
-        <form class="form-inputs">
-            <div class="form-item">
+        <form class="form-inputs" autocomplete="off">
+            <div class="form-item autocomplete">
                 <label>Card name</label>
                 <input
+                    id="cardname"
                     v-model="name"
-                    @change="getSuggestions"
+                    @input="autocomplete()"
                     class="textbox"
                     placeholder="Nicol Bolas, Dragon-God"
                 />
@@ -24,17 +25,25 @@
 
 <script>
 import suggestions from '../api/suggestions';
+import autocomplete from '../helpers/autocomplete';
+
 export default {
     data: function () {
         return {
             name: '',
             foil: '',
-            testData: '',
+            suggestionsData: '',
         };
     },
     methods: {
-        getSuggestions: async function () {
-            this.testData = await suggestions.GetSuggestion();
+        autocomplete: async function () {
+            if (this.name.length > 2) {
+                this.suggestionsData = await suggestions.GetSuggestion(this.name);
+                console.log(this.suggestionsData);
+                autocomplete.Autocomplete(
+                    document.getElementById('cardname', this.suggestionsData)
+                );
+            }
         },
     },
 };

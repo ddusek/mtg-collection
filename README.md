@@ -4,11 +4,20 @@
 
 ### 1. Fetch all cards json file.
 
-`python mtg_collection/fetch/fetch_cards.py`
+`python main.py fetchcards`
 
-### 2. Start db
+### 2. Start redis
+`redis-server redis.conf`
 
-`redis-server mtg_collection/database/redis.conf`
+### 3. fill database
+Databases are loaded from .rdb files.  
+
+If these files are missing, you need to init db first.  
+`python main.py initdb`
+
+Main database - dump_main.rdb.  
+Collections databases - dump_<collection_name>.rdb.
+
 
 ### TODO
 use generator for reading line by line  

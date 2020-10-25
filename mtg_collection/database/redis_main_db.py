@@ -41,7 +41,7 @@ class RedisMainSync():
             card_json = json.loads(line, strict=False)
             if 'set_name' not in card_json or 'name' not in card_json:
                 return None
-            key = f'{card_json["set_name"]}:{card_json["name"]}:{card_json["id"]}'
+            key = f'{card_json["set_name"].lower()}:{card_json["name"].lower()}:{card_json["id"].upper()}'
             selected_value = {
                 'name': card_json['name'],
                 'set': card_json['set_name'],
