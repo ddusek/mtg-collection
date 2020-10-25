@@ -4,3 +4,5 @@ pylint
 tqdm
 rope
 redis
+flask
+flask_cors

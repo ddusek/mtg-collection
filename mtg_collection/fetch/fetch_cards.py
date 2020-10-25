@@ -25,7 +25,3 @@ def fetch_bulk_cards():
     bulks = json.loads(response.text)
     download_url = list(filter(lambda d: d['type'] == 'all_cards', bulks['data']))[0]['download_uri']
     download_file(download_url)
-
-
-if __name__ == '__main__':
-    fetch_bulk_cards()

@@ -1,0 +1,54 @@
+.container {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    width: 500px;
+    min-height: 200px;
+    background-color: rgb(55, 55, 55);
+    font-size: 22px;
+    h2 {
+        background-color: rgb(25, 25, 25);
+        width: 100%;
+        text-align: center;
+        margin: 0 0 20px 0;
+        padding: 12px 0 5px 0;
+    }
+    .form-inputs {
+        width: 90%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+
+        .form-item {
+            height: 50px;
+            margin: 0 0 10px 0;
+            width: 100%;
+            display: flex;
+            align-items: flex-start;
+
+            .textbox {
+                height: 25px;
+                width: 250px;
+            }
+
+            .checkbox {
+                width: 20px;
+                height: 20px;
+            }
+            
+            label {
+                width: 25%;
+                padding-right: 25px;
+            }
+        }
+        .form-submit {
+            margin: 0 0 15px 0;
+
+            .button {
+                min-width: 350px;
+                min-height: 40px;
+            }
+        }
+    }
+}

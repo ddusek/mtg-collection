@@ -6,4 +6,3 @@ __pycache__
 node_modules
 dist
 mtg_collection/fetch/*.json
-backend/fetch/json_cards.json
