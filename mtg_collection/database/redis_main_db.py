@@ -15,7 +15,7 @@ class RedisMainSync():
 
     def __print_progress(self, i):
         if i % 1000 == 0:
-            print(f'{format((i / self.lines_len * 100), ".2f")}% cards filled out of {self.lines_len} cards')
+            print(f'{format((i / self.lines_len * 100), ".2f")}% cards filled out of {self.lines_len} records')
             sys.stdout.write("\033[F")
             sys.stdout.write("\033[K")
 
@@ -41,7 +41,8 @@ class RedisMainSync():
             card_json = json.loads(line, strict=False)
             if 'set_name' not in card_json or 'name' not in card_json:
                 return None
-            key = f'{card_json["set_name"].lower()}:{card_json["name"].lower()}:{card_json["id"].upper()}'
+            # replace ':' because its used in redis as a key separator
+            key = f'{card_json["set_name"].lower().replace(":", ";")}:{card_json["name"].lower().replace(":", ";")}'
             selected_value = {
                 'name': card_json['name'],
                 'set': card_json['set_name'],
