@@ -41,7 +41,8 @@ export default {
                 this.suggestionsData = await suggestions.GetSuggestion(this.name);
                 console.log(this.suggestionsData);
                 autocomplete.Autocomplete(
-                    document.getElementById('cardname', this.suggestionsData)
+                    document.getElementById('cardname', this.suggestionsData),
+                    this.suggestionsData
                 );
             }
         },
