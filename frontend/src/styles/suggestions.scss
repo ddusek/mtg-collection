@@ -1,0 +1,36 @@
+@import './_variables';
+
+.suggestions {    
+    display: flex;
+    flex-direction: column;
+    
+    button {
+        background-color: $feed-header-color;
+    }
+
+    button:hover {
+        background-color:$suggestions-items-color;
+        cursor: pointer;
+    }
+
+    button:focus {
+        background-color:rgb(25, 125, 25);
+    }
+
+    .card {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        padding: 5px;
+        :hover {
+            cursor: pointer;
+        }
+        .name {
+            color: rgb(225, 225, 225);
+        }
+
+        .edition {
+            color: rgb(155, 155, 0)
+        }
+    }
+}

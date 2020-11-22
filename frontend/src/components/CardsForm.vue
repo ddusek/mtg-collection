@@ -2,12 +2,12 @@
     <div class="container">
         <h2>Add card to collection</h2>
         <form class="form-inputs" autocomplete="off">
-            <div class="form-item autocomplete">
-                <label>Card name</label>
+            <div class="form-item">
+                <label>Card Name</label>
                 <input
-                    id="cardname"
+                    id="cardinputName"
                     v-model="name"
-                    @input="autocomplete()"
+                    @input="getSuggestions()"
                     class="textbox"
                     placeholder="Nicol Bolas, Dragon-God"
                 />
@@ -24,28 +24,31 @@
 </template>
 
 <script>
-import suggestions from '../api/suggestions';
-import autocomplete from '../helpers/autocomplete';
+import { mapActions } from 'vuex';
 
 export default {
     data: function () {
         return {
-            name: '',
             foil: '',
-            suggestionsData: [],
+            suggestedCards: [],
         };
     },
-    methods: {
-        autocomplete: async function () {
-            this.suggestionsData = [];
-            if (this.name.length > 2) {
-                this.suggestionsData = await suggestions.GetSuggestion(this.name);
-                autocomplete.Autocomplete(
-                    document.getElementById('cardname'),
-                    this.suggestionsData
-                );
-            }
+    computed: {
+        name: {
+            get() {
+                return this.$store.state.form.inputName;
+            },
+            set(value) {
+                this.$store.dispatch('form/updateName', value);
+            },
         },
+    },
+    methods: {
+        ...mapActions({
+            getSuggestions(dispatch) {
+                dispatch('cards/getSuggestions', { inputName: this.name });
+            },
+        }),
     },
 };
 </script>

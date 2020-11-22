@@ -2,6 +2,7 @@ from flask import Flask, jsonify
 from flask_cors import CORS, cross_origin
 from redis import Redis
 from redis_helpers import scan_all
+from card_helpers import format_cards
 
 
 app = Flask(__name__)
@@ -25,4 +26,4 @@ def suggest(text):
     redis = Redis(host='localhost', port=6379, db=0)
     data = scan_all(redis, text, 20, 'name')
     # data = [byte.decode('utf-8') for byte in keys]
-    return jsonify(data)
+    return jsonify(format_cards(data))
