@@ -59,12 +59,17 @@
                 top: 100%;
                 left: 0;
                 right: 0;
+                    .edition {
+                        color: rgb(150, 150, 10);
+                    }
+                    .name {
+                        color: rgb(200, 200, 200);
+                    }
             }
             .autocomplete-items div {
-                padding: 10px;
+                padding: 3px;
                 cursor: pointer;
                 background-color: $autocomplete-items-color;
-                border-bottom: 1px solid #d4d4d4;
             }
               .autocomplete-items div:hover {
                 /*when hovering an item:*/
@@ -73,7 +78,17 @@
               .autocomplete-active {
                 /*when navigating through the items using the arrow keys:*/
                 background-color: DodgerBlue !important;
-                color: #ffffff;
+                color: rgb(155, 155, 155);
+            }
+
+            .autocomplete-item {
+                display: flex;
+                align-items: center;
+                flex-direction: column;
+                label {
+                    padding: 0 5px;
+                    width: 100%;
+                }
             }
             
         }

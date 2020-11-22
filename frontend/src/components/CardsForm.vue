@@ -32,16 +32,16 @@ export default {
         return {
             name: '',
             foil: '',
-            suggestionsData: '',
+            suggestionsData: [],
         };
     },
     methods: {
         autocomplete: async function () {
+            this.suggestionsData = [];
             if (this.name.length > 2) {
                 this.suggestionsData = await suggestions.GetSuggestion(this.name);
-                console.log(this.suggestionsData);
                 autocomplete.Autocomplete(
-                    document.getElementById('cardname', this.suggestionsData),
+                    document.getElementById('cardname'),
                     this.suggestionsData
                 );
             }

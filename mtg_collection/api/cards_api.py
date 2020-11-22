@@ -23,6 +23,6 @@ def suggest(text):
     """Return auto suggested cards.
     """
     redis = Redis(host='localhost', port=6379, db=0)
-    keys = scan_all(redis, text, 20)
-    data = [byte.decode('utf-8') for byte in keys]
+    data = scan_all(redis, text, 20, 'name')
+    # data = [byte.decode('utf-8') for byte in keys]
     return jsonify(data)
