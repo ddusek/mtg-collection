@@ -4,9 +4,11 @@
             class="card"
             v-for="card in suggestedCards"
             :key="card.key"
-            v-on:click="updateName(card.key)"
+            @click="updateName(card.key)"
         >
-            <label class="name">{{ card.name }}</label>
+            <label class="name" :class="{ highlighted: $store.state.form.inputName == card.name }">
+                {{ card.name }}
+            </label>
             <label class="edition">{{ card.edition }}</label>
         </button>
     </div>
@@ -14,12 +16,11 @@
 
 <script>
 import { mapActions } from 'vuex';
-import store from '../store/index';
 
 export default {
     computed: {
         suggestedCards() {
-            return store.state.cards.items;
+            return this.$store.state.cards.items;
         },
     },
     methods: {

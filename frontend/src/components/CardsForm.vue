@@ -1,5 +1,5 @@
 <template>
-    <div class="container">
+    <div class="form">
         <h2>Add card to collection</h2>
         <form class="form-inputs" autocomplete="off">
             <div class="form-item">

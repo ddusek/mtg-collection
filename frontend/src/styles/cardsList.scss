@@ -3,6 +3,7 @@
 .suggestions {    
     display: flex;
     flex-direction: column;
+    width: 700px;
     
     button {
         background-color: $feed-header-color;
@@ -22,11 +23,16 @@
         flex-direction: column;
         width: 100%;
         padding: 5px;
+        font-size: 20px;
         :hover {
             cursor: pointer;
         }
         .name {
             color: rgb(225, 225, 225);
+        }
+        
+        .highlighted {
+            background-color: red;
         }
 
         .edition {

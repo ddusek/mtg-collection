@@ -1,13 +1,14 @@
 @import './_variables';
 
-.container {
+.form {
     display: flex;
     align-items: center;
     flex-direction: column;
     width: 500px;
-    min-height: 200px;
+    height: 250px;
     background-color: rgb(55, 55, 55);
     font-size: 22px;
+    margin-right: 100px;
     h2 {
         background-color: rgb(25, 25, 25);
         width: 100%;
