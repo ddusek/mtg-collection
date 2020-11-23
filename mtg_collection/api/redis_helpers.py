@@ -36,11 +36,12 @@ def order_items(text, cards, order_by):
     if order_by == 'name':
         for card in cards:
             card = card.decode('utf-8')
-            edition, name = card.split(':')
-            if text in name:
-                prioritized.append(card)
-            else:
-                rest.append(card)
+            if ':' in card:
+                edition, name = card.split(':')
+                if text in name:
+                    prioritized.append(card)
+                else:
+                    rest.append(card)
         return prioritized + rest
 
     if order_by == 'edition':

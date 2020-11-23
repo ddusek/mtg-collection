@@ -1,6 +1,6 @@
-import requests
 import json
 from tqdm import tqdm
+import requests
 
 
 def download_file(url):
@@ -22,6 +22,6 @@ def fetch_bulk_cards():
     """Fetch all cards bulk data.
     """
     response = requests.get('https://api.scryfall.com/bulk-data')
-    bulks = json.loads(response.text)
-    download_url = list(filter(lambda d: d['type'] == 'all_cards', bulks['data']))[0]['download_uri']
+    cards = json.loads(response.text)
+    download_url = list(filter(lambda d: d['type'] == 'all_cards', cards['data']))[0]['download_uri']
     download_file(download_url)

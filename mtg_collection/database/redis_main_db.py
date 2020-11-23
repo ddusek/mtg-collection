@@ -1,8 +1,20 @@
+"""Redis structure
+Database currently contains all cards and all sets.
+key, value
+cards
+<collection>:<name>, <dictionary_values>
+sets
+<collection>, <dictionary_values>
+
+My cards
+<custom_name(deck, whole_collection)>:<collection>:<name>, <dictinary_values>
+"""
 import sys
 import json
 from pathlib import Path
 from redis import Redis
-from .models import Card
+import requests
+from .models import RedisObject
 
 
 class RedisMainSync():
@@ -49,10 +61,9 @@ class RedisMainSync():
                 'price': card_json['prices']['usd'],
                 'price_foil': card_json['prices']['usd_foil'],
                 'release': card_json['released_at'],
-                }
+            }
             value = json.dumps(selected_value)
-            card_json = Card(key, value)
-            return card_json
+            return RedisObject(key, value)
         except json.JSONDecodeError as err:
             print(err)
             return None
@@ -60,29 +71,59 @@ class RedisMainSync():
             print(err)
             return None
 
-    def init_db(self):
-        """Initialize Redis database and load all cards.
+    def _set_as_object(self, edition):
+        """Return set object.
+        """
+        try:
+            key = edition['name'].lower().replace(':', ';')
+            selected_values = {
+                'image': edition['icon_svg_uri'],
+                'name': edition['name'],
+                'released': edition['released_at']
+            }
+            value = json.dumps(selected_values)
+            return RedisObject(key, value)
+        except json.JSONDecodeError as err:
+            print(err)
+            return None
+        except ValueError as err:
+            print(err)
+            return None
+
+    def _init_sets(self):
+        """Save all sets in db.
+        """
+        response = requests.get('https://api.scryfall.com/sets')
+        sets = response.json()
+        for i, edition in enumerate(sets['data']):
+            _set = self._set_as_object(edition)
+            if _set is None:
+                continue
+            self.write_record(_set)
+        self.redis.bgsave()
+        print('done sets')
+
+    def _init_cards(self):
+        """Save all cards in db.
         """
         self._get_lines()
-        self.redis.flushdb()
         for i, line in enumerate(self.lines):
             self.__print_progress(i)
             card = self._card_as_object(line)
-            if card is None:
-                continue
-            self.write_card(card)
+            if card is not None:
+                self.write_record(card)
         self.redis.bgsave()
-        print('done')
+        print('done cards')
 
-    def write_card(self, card):
-        """Write card from json to database.
+    def init_db(self):
+        """Initialize Redis database and load all cards.
+        """
+        self.redis.flushdb()
+        self._init_cards()
+        self._init_sets()
+        print('done init database')
+
+    def write_record(self, card):
+        """Write record from json to database.
         """
         self.redis.set(card.key, card.value)
-
-
-#  Redis structure
-#  All cards
-#   key, value
-#   <collection>:<name>, <dictionary_values>
-#  My cards
-#   <custom_name(deck, whole_collection)>:<collection>:<name>, <dictinary_values>
