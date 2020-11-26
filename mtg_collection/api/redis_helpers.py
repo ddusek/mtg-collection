@@ -1,4 +1,4 @@
-def scan_all(redis, text, limit=0):
+def get_suggestions(redis, text, limit=0):
     """Scan all keys in database and return keys with given text.
 
     :param redis: redis instance
@@ -11,15 +11,15 @@ def scan_all(redis, text, limit=0):
     matched_keys = []
     cur = 1
     while cur != 0:
-        cur, keys = redis.scan(cur, f'*{text}*', 10000)
+        cur, keys = redis.scan(cur, f'card:*{text}*', 10000)
         matched_keys += keys
         if len(matched_keys) >= limit > 0:
-            ordered = order_by_name_key(text, matched_keys)
+            ordered = _order_by_name_key(text, matched_keys)
             return ordered[:limit]
-    return order_by_name_key(text, matched_keys)
+    return _order_by_name_key(text, matched_keys)
 
 
-def order_by_name_key(text, cards):
+def _order_by_name_key(text, cards):
     """Order cards by card name containing text, not edition.
 
     :param text: text to find in all keys
@@ -30,18 +30,28 @@ def order_by_name_key(text, cards):
     rest = []
     for card in cards:
         card = card.decode('utf-8')
-        if ':' in card:
-            name = card.split(':')[1]
-            if text in name:
-                prioritized.append(card)
-            else:
-                rest.append(card)
-    matched = full_match(text, prioritized)
+        name = card.split(':')[2]
+        if text in name:
+            prioritized.append(card)
+        else:
+            rest.append(card)
+    matched = _full_match(text, prioritized)
     prioritized = [card for card in prioritized if card not in matched]
     return matched + prioritized + rest
 
 
-def full_match(text, cards):
+def _full_match(text, cards):
     """Return list of cards where their name is match of the given text.
     """
-    return [card for card in cards if card.split(':')[1] == text]
+    return [card for card in cards if card.split(':')[2] == text]
+
+
+def get_all_editions(redis):
+    """Get all editions from database.
+    """
+    matched_keys = []
+    cur = 1
+    while cur != 0:
+        cur, keys = redis.scan(cur, 'edition:*', 10000)
+        matched_keys += keys
+    return matched_keys

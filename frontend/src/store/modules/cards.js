@@ -1,4 +1,4 @@
-import suggestions from '../../api/suggestions';
+import api from '../../api/cards';
 
 const state = () => ({
     items: [],
@@ -8,7 +8,7 @@ const getters = {};
 
 const actions = {
     async getSuggestions({ commit }, payload) {
-        let data = await suggestions.GetSuggestion(payload.inputName);
+        let data = await api.GetCardSuggestions(payload.inputName);
         commit('setItems', data);
     },
 };

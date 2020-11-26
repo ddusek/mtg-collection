@@ -2,9 +2,9 @@
 Database currently contains all cards and all sets.
 key, value
 cards
-<collection>:<name>, <dictionary_values>
+card:<collection>:<name>, <dictionary_values>
 sets
-<collection>, <dictionary_values>
+edition:<collection>, <dictionary_values>
 
 My cards
 <custom_name(deck, whole_collection)>:<collection>:<name>, <dictinary_values>
@@ -54,7 +54,8 @@ class RedisMainSync():
             if 'set_name' not in card_json or 'name' not in card_json:
                 return None
             # replace ':' because its used in redis as a key separator
-            key = f'{card_json["set_name"].lower().replace(":", ";")}:{card_json["name"].lower().replace(":", ";")}'
+            key = f'card:{card_json["set_name"].lower().replace(":", ";")}: \
+                {card_json["name"].lower().replace(":", ";")}'
             selected_value = {
                 'name': card_json['name'],
                 'set': card_json['set_name'],
@@ -75,7 +76,7 @@ class RedisMainSync():
         """Return set object.
         """
         try:
-            key = edition['name'].lower().replace(':', ';')
+            key = f'edition:{edition["name"].lower().replace(":", ";")}'
             selected_values = {
                 'image': edition['icon_svg_uri'],
                 'name': edition['name'],
@@ -95,7 +96,7 @@ class RedisMainSync():
         """
         response = requests.get('https://api.scryfall.com/sets')
         sets = response.json()
-        for i, edition in enumerate(sets['data']):
+        for _, edition in enumerate(sets['data']):
             _set = self._set_as_object(edition)
             if _set is None:
                 continue
