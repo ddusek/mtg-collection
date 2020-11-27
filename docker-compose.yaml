@@ -4,29 +4,32 @@ services:
   redis:
     image: redis:latest
     container_name: mtg-redis
-    ports:
-      - 6379:6379
     build:
       dockerfile: Redis.Dockerfile
       context: ./
-    networks: 
+    ports:
+      - 6379:6379
+    networks:
       - mtg
     volumes:
       - ./mtg_collection/logs:/app/logs
+
   flask:
+    container_name: mtg-flask
     build:
       context: ./
       dockerfile: Flask.Dockerfile
-    container_name: mtg-flask
-    volumes:
-      - ./mtg_collection/api:/app
-    ports: 
+    ports:
       - 5000:5000
-    depends_on: 
-      - redis
     networks:
       - mtg
+    volumes:
+      - ./mtg_collection/api:/app/api
+    env_file:
+      - dev.env
+    depends_on:
+      - redis
 
 networks:
-  mtg: 
+  mtg:
     driver: bridge
