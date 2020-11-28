@@ -13,6 +13,7 @@ services:
       - mtg
     volumes:
       - ./mtg_collection/logs:/app/logs
+    # hostname: mtg-redis
 
   flask:
     container_name: mtg-flask
@@ -29,6 +30,18 @@ services:
       - dev.env
     depends_on:
       - redis
+
+  frontend:
+    container_name: mtg-frontend
+    build:
+      context: ./
+      dockerfile: Frontend.Dockerfile
+    ports: 
+      - 8080:8080
+    networks:
+      - mtg
+    # volumes:
+    #   - ./frontend:/app
 
 networks:
   mtg:

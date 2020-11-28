@@ -15,7 +15,7 @@ if __name__ == '__main__':
     {PARAMC}fetchcards{ENDC}: download json file with all cards.
         ''')
     elif sys.argv[1] == 'initdb':
-        sync = RedisMainSync(host='localhost', port=6379, db=0)
+        sync = RedisMainSync(host='0.0.0.0', port=6379, db=0)
         sync.init_db()
     elif sys.argv[1] == 'fetchcards':
         fetch_bulk_cards()

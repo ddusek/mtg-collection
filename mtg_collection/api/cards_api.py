@@ -4,6 +4,9 @@ from redis import Redis
 from redis_helpers import get_suggestions, get_all_editions
 from card_helpers import format_cards, format_editions
 
+MAIN_REDIS_HOST = 'mtg-redis'
+MAIN_REDIS_PORT = 6379
+MAIN_REDIS_DB = 0
 
 app = Flask(__name__)
 cors = CORS(app)
@@ -23,7 +26,7 @@ def hello_world():
 def suggest(text):
     """Return auto suggested cards.
     """
-    redis = Redis(host='localhost', port=6379, db=0)
+    redis = Redis(host=MAIN_REDIS_HOST, port=MAIN_REDIS_PORT, db=MAIN_REDIS_DB)
     data = get_suggestions(redis, text, 20)
     return jsonify(format_cards(data))
 
@@ -33,7 +36,7 @@ def suggest(text):
 def editions():
     """Return all editions.
     """
-    redis = Redis(host='localhost', port=6379, db=0)
+    redis = Redis(host=MAIN_REDIS_HOST, port=MAIN_REDIS_PORT, db=MAIN_REDIS_DB)
     data = get_all_editions(redis)
     print(data)
     data_decoded = [byte.decode('utf-8') for byte in data]
