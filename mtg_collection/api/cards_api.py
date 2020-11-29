@@ -38,6 +38,5 @@ def editions():
     """
     redis = Redis(host=MAIN_REDIS_HOST, port=MAIN_REDIS_PORT, db=MAIN_REDIS_DB)
     data = get_all_editions(redis)
-    print(data)
     data_decoded = [byte.decode('utf-8') for byte in data]
     return jsonify(format_editions(data_decoded))

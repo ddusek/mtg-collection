@@ -13,7 +13,6 @@ services:
       - mtg
     volumes:
       - ./mtg_collection/logs:/app/logs
-    # hostname: mtg-redis
 
   flask:
     container_name: mtg-flask
@@ -40,8 +39,8 @@ services:
       - 8080:8080
     networks:
       - mtg
-    # volumes:
-    #   - ./frontend:/app
+    volumes:
+      - ./frontend/src:/app/src
 
 networks:
   mtg:
