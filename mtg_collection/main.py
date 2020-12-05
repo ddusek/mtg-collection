@@ -1,6 +1,5 @@
 import sys
-# from database.redis_collections_db import RedisCollections
-from database.redis_main_db import RedisMainSync
+from database.redis_sync import RedisSyncDB
 from fetch.fetch_cards import fetch_bulk_cards
 
 if __name__ == '__main__':
@@ -15,7 +14,7 @@ if __name__ == '__main__':
     {PARAMC}fetchcards{ENDC}: download json file with all cards.
         ''')
     elif sys.argv[1] == 'initdb':
-        sync = RedisMainSync(host='0.0.0.0', port=6379, db=0)
+        sync = RedisSyncDB(host='0.0.0.0', port=6379, db=0)
         sync.init_db()
     elif sys.argv[1] == 'fetchcards':
         fetch_bulk_cards()

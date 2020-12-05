@@ -6,4 +6,4 @@ COPY mtg_collection/config /app/config
 
 EXPOSE 6379
 
-CMD [ "redis-server", "/app/config/redis_main.conf" ]
+CMD [ "redis-server", "/app/config/redis.conf" ]
