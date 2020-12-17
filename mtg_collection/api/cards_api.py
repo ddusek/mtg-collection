@@ -1,8 +1,8 @@
 from flask import Flask, jsonify
 from flask_cors import CORS, cross_origin
 from redis import Redis
-from redis_helpers import get_suggestions, get_all_editions
-from card_helpers import format_cards, format_editions
+from card_helper import format_cards, format_editions
+from redis_helper import get_suggestions, get_all_editions
 
 MAIN_REDIS_HOST = 'mtg-redis'
 MAIN_REDIS_PORT = 6379

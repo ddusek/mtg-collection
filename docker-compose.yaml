@@ -5,14 +5,16 @@ services:
     image: redis:latest
     container_name: mtg-redis
     build:
-      dockerfile: Redis.Dockerfile
       context: ./
+      dockerfile: Redis.Dockerfile
     ports:
       - 6379:6379
     networks:
       - mtg
     volumes:
-      - ./mtg_collection/logs:/app/logs
+      - ./mtg_collection/config:/app/config
+      - ./mtg_collection/database:/app/database
+      - ./mtg_collection/data:/data
 
   flask:
     container_name: mtg-flask
