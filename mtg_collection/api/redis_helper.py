@@ -1,24 +1,3 @@
-def get_suggestions(redis, text, limit=0):
-    """Scan all keys in database and return keys with given text.
-
-    :param redis: redis instance
-    :param text: text to find in all keys
-    :param limit: number of items to return (default (0) = all)
-
-    :return: list of keys in bytes
-    """
-    text = text.lower()
-    matched_keys = []
-    cur = 1
-    while cur != 0:
-        cur, keys = redis.scan(cur, f'card:*{text}*', 10000)
-        matched_keys += keys
-        if len(matched_keys) >= limit > 0:
-            ordered = _order_by_name_key(text, matched_keys)
-            return ordered[:limit]
-    return _order_by_name_key(text, matched_keys)
-
-
 def _order_by_name_key(text, cards):
     """Order cards by card name containing text, not edition.
 
@@ -46,12 +25,47 @@ def _full_match(text, cards):
     return [card for card in cards if card.split(':')[2] == text]
 
 
-def get_all_editions(redis):
-    """Get all editions from database.
+def _get_matches(redis, text):
+    """Get keys from redis filtered by text.
     """
     matched_keys = []
     cur = 1
     while cur != 0:
-        cur, keys = redis.scan(cur, 'edition:*', 10000)
+        cur, keys = redis.scan(cur, text, 10000)
         matched_keys += keys
     return matched_keys
+
+
+def get_suggestions(redis, text, limit=0):
+    """Scan all keys in database and return keys with given text.
+
+    :param redis: redis instance
+    :param text: text to find in all keys
+    :param limit: number of items to return (default (0) = all)
+
+    :return: list of keys in bytes
+    """
+    text = text.lower()
+    matches = _get_matches(redis, f'card:*{text}*')
+    if len(matches) >= limit > 0:
+        matches = _order_by_name_key(text, matches)
+        return matches[:limit]
+    return _order_by_name_key(text, matches)
+
+
+def get_all_editions(redis):
+    """Get all editions from database.
+    """
+    return _get_matches(redis, 'edition:*')
+
+
+def get_collection(redis, name):
+    """Get all cards from collection.
+    """
+    return _get_matches(redis, f'collection:{name}:*')
+
+
+def get_collections(redis):
+    """Get all collections
+    """
+    return _get_matches(redis, f'collection:*')

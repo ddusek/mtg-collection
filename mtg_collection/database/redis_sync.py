@@ -1,11 +1,14 @@
 """Redis structure
 Database currently contains all cards, all sets and all created collections.
 key, value
+
 cards
-card:<collection>:<name>, <dictionary_values>
+card:<edition>:<name>, <dictionary_values>
+
 sets
-edition:<collection>, <dictionary_values>
-collection
+edition:<edition>, <dictionary_values>
+
+my collections
 collection:<collection_name>, <dictionary_values>
 
 My cards
