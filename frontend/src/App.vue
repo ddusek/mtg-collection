@@ -4,17 +4,21 @@
       <h1>MTG_Collection</h1>
     </header>
     <div id="main">
-      <Form />
+      <div>
+        <CardForm />
+        <CollectionForm />
+      </div>
       <CardsList />
     </div>
   </div>
 </template>
 
 <script>
-import Form from './components/CardsForm';
+import CardForm from './components/CardsForm';
+import CollectionForm from './components/CollectionForm';
 import CardsList from './components/CardsList';
 
 export default {
-  components: { Form, CardsList },
+  components: { CardForm, CollectionForm, CardsList },
 };
 </script>

@@ -3,6 +3,7 @@ import api from '../../api/cards';
 const state = () => ({
     inputName: '',
     allEditions: [],
+    addedSuccess: false,
 });
 
 const getters = {};
@@ -12,8 +13,12 @@ const actions = {
         commit('setName', payload);
     },
     async getAllEditions({ commit }) {
-        let data = await api.GetAllEditions();
+        let data = await api.getAllEditions();
         commit('setAllEditions', data);
+    },
+    async addCard({ commit }, payload) {
+        let data = await api.addCard(payload.collection, payload.card, payload.units);
+        commit('setAddedSuccess', data);
     },
 };
 
@@ -23,6 +28,9 @@ const mutations = {
     },
     setAllEditions(state, payload) {
         state.allEditions = payload;
+    },
+    setAddedSuccess(state, payload) {
+        state.addedSuccess = payload;
     },
 };
 

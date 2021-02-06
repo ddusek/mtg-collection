@@ -2,4 +2,5 @@
 max-line-length=120
 
 [TYPECHECK]
-disable = missing-module-docstring
+disable = missing-module-docstring,
+          redefined-outer-name

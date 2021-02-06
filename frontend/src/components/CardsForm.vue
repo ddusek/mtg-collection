@@ -1,11 +1,11 @@
 <template>
   <div class="container">
     <h2>Add card to collection</h2>
-    <form class="form" autocomplete="off">
+    <form class="form" action="post" v-on:submit.prevent="addCard">
       <div class="form__input">
         <label>Name</label>
         <input
-          id="cardInputName"
+          id="inputName"
           v-model="name"
           @input="getSuggestions()"
           class="form__input--textbox"
@@ -14,7 +14,7 @@
       </div>
       <div class="form__input">
         <label>Edition</label>
-        <select v-model="selected_edition" id="cardInputName" class="form__input--dropdown">
+        <select v-model="selected_edition" id="inputName" class="form__input--dropdown">
           <option v-for="edition in all_editions" v-bind:value="edition.key" :key="edition.id">
             {{ edition.name }}
           </option>
@@ -43,33 +43,36 @@ export default {
   computed: {
     name: {
       get() {
-        return this.$store.state.form.inputName;
+        return this.$store.state.cardForm.inputName;
       },
       set(value) {
-        this.$store.dispatch('form/updateName', value);
+        this.$store.dispatch('cardForm/updateName', value);
       },
     },
     selected_edition: {
       get() {
-        return this.$store.state.form.inputEdition;
+        return this.$store.state.cardForm.inputEdition;
       },
       set(value) {
-        this.$store.dispatch('form/updateEdition', value);
+        this.$store.dispatch('cardForm/updateEdition', value);
       },
     },
     all_editions: {
       get() {
-        return this.$store.state.form.allEditions;
+        return this.$store.state.cardForm.allEditions;
       },
     },
   },
   methods: {
     ...mapActions({
       getSuggestions(dispatch) {
-        dispatch('cards/getSuggestions', { inputName: this.name });
+        dispatch('suggest/getSuggestions', { inputName: this.name });
       },
       getAllEditions(dispatch) {
-        dispatch('form/getAllEditions');
+        dispatch('cardForm/getAllEditions');
+      },
+      addCard(dispatch) {
+        dispatch('cardForm/addCard');
       },
     }),
   },
@@ -89,6 +92,7 @@ export default {
   background-color: rgb(55, 55, 55);
   font-size: 22px;
   margin-right: 100px;
+  margin-bottom: 100px;
 
   h2 {
     background-color: rgb(25, 25, 25);

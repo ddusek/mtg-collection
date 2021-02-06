@@ -9,7 +9,7 @@
       <label
         class="suggestions__card--name"
         :class="{
-          'suggestions__card--highlighted': $store.state.form.inputName == card.name,
+          'suggestions__card--highlighted': $store.state.cardForm.inputName == card.name,
         }"
       >
         {{ card.name }}
@@ -25,13 +25,13 @@ import { mapActions } from 'vuex';
 export default {
   computed: {
     suggestedCards() {
-      return this.$store.state.cards.items;
+      return this.$store.state.suggest.items;
     },
   },
   methods: {
     ...mapActions({
       updateName(dispatch, value) {
-        dispatch('form/updateName', value);
+        dispatch('cardForm/updateName', value);
       },
     }),
   },

@@ -1,13 +1,15 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import cards from './modules/cards';
-import form from './modules/form';
+import suggest from './modules/suggest';
+import cardForm from './modules/cardForm';
+import collectionForm from './modules/collectionForm';
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
     modules: {
-        cards,
-        form,
+        suggest,
+        cardForm,
+        collectionForm,
     },
 });

@@ -68,4 +68,21 @@ def get_collection(redis, name):
 def get_collections(redis):
     """Get all collections
     """
-    return _get_matches(redis, f'collection:*')
+    return _get_matches(redis, 'collection:*')
+
+
+def add_card_to_redis(redis, collection, card, units):
+    """Add card and its units to a collection.
+    """
+    key = f'{collection}:{card}:{units}'
+    value = redis.get(card)
+    return redis.set(key, value) if value else False
+
+
+def add_collection_to_redis(redis, collection):
+    """Add new empty collection
+    :return: 'success', 'failed' or 'exists' - if collection is already there.
+    """
+    if redis.get(collection) is not None:
+        return {'msg': 'exists'}
+    return {'msg': redis.set(collection, '')}

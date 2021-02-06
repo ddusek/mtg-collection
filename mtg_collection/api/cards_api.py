@@ -2,7 +2,8 @@ from flask import Flask, jsonify
 from flask_cors import CORS, cross_origin
 from redis import Redis
 from card_helper import format_cards, format_editions
-from redis_helper import get_suggestions, get_all_editions, get_collection, get_collections
+from redis_helper import (get_suggestions, get_all_editions, get_collection, get_collections,
+                          add_card_to_redis, add_collection_to_redis)
 
 MAIN_REDIS_HOST = 'mtg-redis'
 MAIN_REDIS_PORT = 6379
@@ -11,7 +12,7 @@ MAIN_REDIS_DB = 0
 app = Flask(__name__)
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
-redis = Redis(host=MAIN_REDIS_HOST, port=MAIN_REDIS_PORT, db=MAIN_REDIS_DB)
+REDIS = Redis(host=MAIN_REDIS_HOST, port=MAIN_REDIS_PORT, db=MAIN_REDIS_DB)
 
 
 @app.route('/')
@@ -27,7 +28,7 @@ def hello_world():
 def suggest(text):
     """Return auto suggested cards.
     """
-    data = get_suggestions(redis, text, 20)
+    data = get_suggestions(REDIS, text, 20)
     return jsonify(format_cards(data))
 
 
@@ -36,7 +37,7 @@ def suggest(text):
 def editions():
     """Return all editions.
     """
-    data = get_all_editions(redis)
+    data = get_all_editions(REDIS)
     data_decoded = [byte.decode('utf-8') for byte in data]
     return jsonify(format_editions(data_decoded))
 
@@ -46,7 +47,7 @@ def editions():
 def collections():
     """Return all collections.
     """
-    data = get_collections(redis)
+    data = get_collections(REDIS)
     data_decoded = [byte.decode('utf-8') for byte in data]
     return jsonify(data_decoded)
 
@@ -56,7 +57,9 @@ def collections():
 def collection(name):
     """Return all cards from collection by its name.
     """
-    return name
+    data = get_collection(REDIS, name)
+    data_decoded = [byte.decode('utf-8') for byte in data]
+    return jsonify(data_decoded)
 
 
 @app.route('/add/<collection>/<card>/<units>')
@@ -64,7 +67,7 @@ def collection(name):
 def add_card(collection, card, units):
     """Add card to collection.
     """
-    return
+    return add_card_to_redis(REDIS, collection, card, units)
 
 
 @app.route('/remove/<collection>/<card>/<units>')
@@ -75,9 +78,9 @@ def remove_card(collection, card, units):
     return
 
 
-@app.route('/add/<collection>')
+@app.route('/add/<collection>', methods=['POST'])
 @cross_origin()
 def add_collection(collection):
     """Add new collection.
     """
-    return
+    return jsonify(add_collection_to_redis(REDIS, collection))

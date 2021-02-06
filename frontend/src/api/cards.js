@@ -1,12 +1,12 @@
 import axios from 'axios';
 
-const APIURL = 'http://localhost:5000/';
+const APIURL = 'http://localhost:5000';
 
-const GetCardSuggestions = async (input) => {
+const getCardSuggestions = async (input) => {
     axios.defaults.xsrfCookieName = 'csrftoken';
     axios.defaults.xsrfHeaderName = 'X-CSRFTOKEN';
     return axios
-        .get(`${APIURL}suggest/${input}`)
+        .get(`${APIURL}/suggest/${input}`)
         .then((response) => {
             return response.data;
         })
@@ -16,13 +16,41 @@ const GetCardSuggestions = async (input) => {
         });
 };
 
-const GetAllEditions = async () => {
+const getAllEditions = async () => {
     axios.defaults.xsrfCookieName = 'csrftoken';
     axios.defaults.xsrfHeaderName = 'X-CSRFTOKEN';
     return axios
-        .get(`${APIURL}editions`)
+        .get(`${APIURL}/editions`)
         .then((response) => {
             return response.data;
+        })
+        .catch((error) => {
+            console.log(error);
+            return null;
+        });
+};
+
+const addCard = async (collection, card, units) => {
+    axios.defaults.xsrfCookieName = 'csrftoken';
+    axios.defaults.xsrfHeaderName = 'X-CSRFTOKEN';
+    return axios
+        .post(`${APIURL}/add/${collection}/${card}/${units}`)
+        .then((response) => {
+            return response.status.success;
+        })
+        .catch((error) => {
+            console.log(error);
+            return null;
+        });
+};
+
+const addCollection = async (collection) => {
+    axios.defaults.xsrfCookieName = 'csrftoken';
+    axios.defaults.xsrfHeaderName = 'X-CSRFTOKEN';
+    return axios
+        .post(`${APIURL}/add/${collection}`)
+        .then((response) => {
+            return response.status == 200;
         })
         .catch((error) => {
             console.log(error);
@@ -31,6 +59,8 @@ const GetAllEditions = async () => {
 };
 
 export default {
-    GetCardSuggestions,
-    GetAllEditions,
+    getCardSuggestions,
+    getAllEditions,
+    addCard,
+    addCollection,
 };
