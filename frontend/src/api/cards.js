@@ -30,6 +30,20 @@ const getAllEditions = async () => {
         });
 };
 
+const getAllCollections = async () => {
+    axios.defaults.xsrfCookieName = 'csrftoken';
+    axios.defaults.xsrfHeaderName = 'X-CSRFTOKEN';
+    return axios
+        .get(`${APIURL}/collections`)
+        .then((response) => {
+            return response.data;
+        })
+        .catch((error) => {
+            console.log(error);
+            return null;
+        });
+};
+
 const addCard = async (collection, card, units) => {
     axios.defaults.xsrfCookieName = 'csrftoken';
     axios.defaults.xsrfHeaderName = 'X-CSRFTOKEN';
@@ -61,6 +75,7 @@ const addCollection = async (collection) => {
 export default {
     getCardSuggestions,
     getAllEditions,
+    getAllCollections,
     addCard,
     addCollection,
 };

@@ -11,13 +11,13 @@ def format_cards(cards_data):
     return cards
 
 
-def format_editions(editions_data):
-    """Format data from Redis edition objects.
+def format_dropdown(data):
+    """Format data from Redis objects to dropdown menu.
 
-    :param editions_data: Redis keys.
+    :param data: Redis keys.
     """
     editions = []
-    for i, data in enumerate(editions_data):
+    for i, data in enumerate(data):
         data_list = data.split(':')
         edition = ({'id': i, 'key': data, 'name': data_list[1]})
         editions.append(edition)

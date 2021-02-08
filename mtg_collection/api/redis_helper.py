@@ -59,16 +59,16 @@ def get_all_editions(redis):
     return _get_matches(redis, 'edition:*')
 
 
+def get_all_collections(redis):
+    """Get all collections from database.
+    """
+    return _get_matches(redis, 'collection:*')
+
+
 def get_collection(redis, name):
     """Get all cards from collection.
     """
     return _get_matches(redis, f'collection:{name}:*')
-
-
-def get_collections(redis):
-    """Get all collections
-    """
-    return _get_matches(redis, 'collection:*')
 
 
 def add_card_to_redis(redis, collection, card, units):
@@ -83,6 +83,6 @@ def add_collection_to_redis(redis, collection):
     """Add new empty collection
     :return: 'success', 'failed' or 'exists' - if collection is already there.
     """
-    if redis.get(collection) is not None:
+    if redis.get(f'collection:{collection}') is not None:
         return {'msg': 'exists'}
-    return {'msg': redis.set(collection, '')}
+    return {'msg': redis.set(f'collection:{collection}', '')}

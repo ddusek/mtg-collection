@@ -8,7 +8,7 @@ const getters = {};
 
 const actions = {
     async getSuggestions({ commit }, payload) {
-        let data = await api.getCardSuggestions(payload.inputName);
+        let data = await api.getCardSuggestions(payload.cardName);
         commit('setItems', data);
     },
 };

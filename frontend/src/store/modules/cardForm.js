@@ -1,15 +1,18 @@
 import api from '../../api/cards';
 
 const state = () => ({
-    inputName: '',
+    cardName: '',
+    collectionName: '',
+    editionName: '',
     allEditions: [],
+    allCollections: [],
     addedSuccess: false,
 });
 
 const getters = {};
 
 const actions = {
-    async updateName({ commit }, payload) {
+    updateName({ commit }, payload) {
         commit('setName', payload);
     },
     async getAllEditions({ commit }) {
@@ -20,17 +23,24 @@ const actions = {
         let data = await api.addCard(payload.collection, payload.card, payload.units);
         commit('setAddedSuccess', data);
     },
+    async getAllCollections({ commit }) {
+        let data = await api.getAllCollections();
+        commit('setAllCollections', data);
+    },
 };
 
 const mutations = {
     setName(state, payload) {
-        state.inputName = payload;
+        state.cardName = payload;
     },
     setAllEditions(state, payload) {
         state.allEditions = payload;
     },
     setAddedSuccess(state, payload) {
         state.addedSuccess = payload;
+    },
+    setAllCollections(state, payload) {
+        state.allCollections = payload;
     },
 };
 

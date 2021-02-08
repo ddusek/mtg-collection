@@ -3,9 +3,9 @@
     <h2>Add card to collection</h2>
     <form class="form" action="post" v-on:submit.prevent="addCard">
       <div class="form__input">
-        <label>Name</label>
+        <label>Card name</label>
         <input
-          id="inputName"
+          id="cardName"
           v-model="name"
           @input="getSuggestions()"
           class="form__input--textbox"
@@ -14,7 +14,7 @@
       </div>
       <div class="form__input">
         <label>Edition</label>
-        <select v-model="selected_edition" id="inputName" class="form__input--dropdown">
+        <select v-model="selected_edition" id="edition" class="form__input--dropdown">
           <option v-for="edition in all_editions" v-bind:value="edition.key" :key="edition.id">
             {{ edition.name }}
           </option>
@@ -23,6 +23,30 @@
       <div class="form__input">
         <label>Is foil</label>
         <input class="form__input--checkbox" v-model="foil" type="checkbox" id="checkbox" />
+      </div>
+      <div class="form__input">
+        <label>Units</label>
+        <input
+          id="cardUnits"
+          type="number"
+          v-model="units"
+          class="form__input--textbox"
+          min="1"
+          max="999"
+          value="1"
+        />
+      </div>
+      <div class="form__input">
+        <label>Collection</label>
+        <select v-model="selected_collection" id="collection" class="form__input--dropdown">
+          <option
+            v-for="collection in all_collections"
+            v-bind:value="collection.key"
+            :key="collection.id"
+          >
+            {{ collection.name }}
+          </option>
+        </select>
       </div>
       <div class="form__submit">
         <input type="submit" class="form__submit__button" value="Add" />
@@ -43,18 +67,10 @@ export default {
   computed: {
     name: {
       get() {
-        return this.$store.state.cardForm.inputName;
+        return this.$store.state.cardForm.cardName;
       },
       set(value) {
         this.$store.dispatch('cardForm/updateName', value);
-      },
-    },
-    selected_edition: {
-      get() {
-        return this.$store.state.cardForm.inputEdition;
-      },
-      set(value) {
-        this.$store.dispatch('cardForm/updateEdition', value);
       },
     },
     all_editions: {
@@ -62,14 +78,35 @@ export default {
         return this.$store.state.cardForm.allEditions;
       },
     },
+    all_collections: {
+      get() {
+        return this.$store.state.cardForm.allCollections;
+      },
+    },
+    selected_edition: {
+      get() {
+        return this.$store.state.cardForm.editionName;
+      },
+      set(value) {
+        this.$store.dispatch('cardForm/updateEdition', value);
+      },
+    },
+    selected_collection: {
+      get() {
+        return this.$store.state.cardForm.collectionName;
+      },
+    },
   },
   methods: {
     ...mapActions({
       getSuggestions(dispatch) {
-        dispatch('suggest/getSuggestions', { inputName: this.name });
+        dispatch('suggest/getSuggestions', { cardName: this.name });
       },
       getAllEditions(dispatch) {
         dispatch('cardForm/getAllEditions');
+      },
+      getAllCollections(dispatch) {
+        dispatch('cardForm/getAllCollections');
       },
       addCard(dispatch) {
         dispatch('cardForm/addCard');
@@ -78,6 +115,7 @@ export default {
   },
   beforeMount() {
     this.getAllEditions();
+    this.getAllCollections();
   },
 };
 </script>
@@ -88,7 +126,7 @@ export default {
   align-items: center;
   flex-direction: column;
   width: 500px;
-  height: 320px;
+  height: 440px;
   background-color: rgb(55, 55, 55);
   font-size: 22px;
   margin-right: 100px;

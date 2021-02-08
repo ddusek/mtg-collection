@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import CardForm from './components/CardsForm';
+import CardForm from './components/CardForm';
 import CollectionForm from './components/CollectionForm';
 import CardsList from './components/CardsList';
 
