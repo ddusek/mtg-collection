@@ -76,7 +76,7 @@ def add_card_to_redis(redis, collection, card, units):
     """
     key = f'{collection}:{card}:{units}'
     value = redis.get(card)
-    return redis.set(key, value) if value else False
+    return {'success': redis.set(key, value) if value else False}
 
 
 def add_collection_to_redis(redis, collection):

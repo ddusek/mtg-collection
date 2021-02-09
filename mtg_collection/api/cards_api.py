@@ -62,12 +62,12 @@ def collection(name):
     return jsonify(data_decoded)
 
 
-@app.route('/add/<collection>/<card>/<units>')
+@app.route('/add/<collection>/<card>/<units>', methods=['POST'])
 @cross_origin()
 def add_card(collection, card, units):
     """Add card to collection.
     """
-    return add_card_to_redis(REDIS, collection, card, units)
+    return jsonify(add_card_to_redis(REDIS, collection, card, units))
 
 
 @app.route('/remove/<collection>/<card>/<units>')

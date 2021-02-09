@@ -122,7 +122,11 @@ export default {
         dispatch('cardForm/getAllCollections');
       },
       addCard(dispatch) {
-        dispatch('cardForm/addCard');
+        dispatch('cardForm/addCard', {
+          collection: this.selected_collection,
+          card: this.name,
+          units: this.units,
+        });
       },
     }),
   },
