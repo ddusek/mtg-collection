@@ -58,11 +58,6 @@
 import { mapActions } from 'vuex';
 
 export default {
-  data: function () {
-    return {
-      foil: '',
-    };
-  },
   computed: {
     name: {
       get() {
@@ -90,14 +85,28 @@ export default {
         this.$store.dispatch('cardForm/updateEdition', value);
       },
     },
-    selected_collection: {
+    foil: {
       get() {
-        return this.$store.state.cardForm.collectionName;
+        return this.$store.state.cardForm.foil;
+      },
+      set(value) {
+        this.$store.dispatch('cardForm/updateFoil', value);
       },
     },
     units: {
       get() {
         return this.$store.state.cardForm.units;
+      },
+      set(value) {
+        this.$store.dispatch('cardForm/updateUnits', value);
+      },
+    },
+    selected_collection: {
+      get() {
+        return this.$store.state.cardForm.collectionName;
+      },
+      set(value) {
+        this.$store.dispatch('cardForm/updateCollection', value);
       },
     },
   },

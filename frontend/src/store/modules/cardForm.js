@@ -2,9 +2,10 @@ import api from '../../api/cards';
 
 const state = () => ({
     cardName: '',
-    collectionName: '',
     editionName: '',
+    foil: false,
     units: 1,
+    collectionName: '',
     allEditions: [],
     allCollections: [],
     addedSuccess: false,
@@ -16,8 +17,17 @@ const actions = {
     updateName({ commit }, payload) {
         commit('setName', payload);
     },
+    updateEdition({ commit }, payload) {
+        commit('setEdition', payload);
+    },
+    updateFoil({ commit }, payload) {
+        commit('setFoil', payload);
+    },
     updateUnits({ commit }, payload) {
         commit('setUnits', payload);
+    },
+    updateCollection({ commit }, payload) {
+        commit('setCollection', payload);
     },
     async getAllEditions({ commit }) {
         let data = await api.getAllEditions();
@@ -37,8 +47,17 @@ const mutations = {
     setName(state, payload) {
         state.cardName = payload;
     },
+    setEdition(state, payload) {
+        state.editionName = payload;
+    },
+    setFoil(state, payload) {
+        state.foil = payload;
+    },
     setUnits(state, payload) {
         state.units = payload;
+    },
+    setCollection(state, payload) {
+        state.collectionName = payload;
     },
     setAllEditions(state, payload) {
         state.allEditions = payload;
