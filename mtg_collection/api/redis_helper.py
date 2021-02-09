@@ -29,7 +29,7 @@ def _get_matches(redis, text):
     """Get keys from redis filtered by text.
     """
     matched_keys = []
-    cur = 1
+    cur = '0'
     while cur != 0:
         cur, keys = redis.scan(cur, text, 10000)
         matched_keys += keys

@@ -33,7 +33,6 @@
           class="form__input--textbox"
           min="1"
           max="999"
-          value="1"
         />
       </div>
       <div class="form__input">
@@ -94,6 +93,11 @@ export default {
     selected_collection: {
       get() {
         return this.$store.state.cardForm.collectionName;
+      },
+    },
+    units: {
+      get() {
+        return this.$store.state.cardForm.units;
       },
     },
   },
