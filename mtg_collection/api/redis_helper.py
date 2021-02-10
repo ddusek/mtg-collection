@@ -53,6 +53,12 @@ def get_suggestions(redis, text, limit=0):
     return _order_by_name_key(text, matches)
 
 
+def get_set_keys(redis, set_name):
+    """Get all keys in given set.
+    """
+    return redis.smembers(set_name)
+
+
 def get_all_editions(redis):
     """Get all editions from database.
     """
@@ -62,7 +68,7 @@ def get_all_editions(redis):
 def get_all_collections(redis):
     """Get all collections from database.
     """
-    return _get_matches(redis, 'collection:*')
+    return get_set_keys(redis, 'collections')
 
 
 def get_collection(redis, name):
@@ -85,4 +91,5 @@ def add_collection_to_redis(redis, collection):
     """
     if redis.get(f'collection:{collection}') is not None:
         return {'msg': 'exists'}
-    return {'msg': redis.set(f'collection:{collection}', '')}
+    redis.sadd('collections', collection)
+    return {'success': True}

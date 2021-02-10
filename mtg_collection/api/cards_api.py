@@ -1,7 +1,7 @@
 from flask import Flask, jsonify
 from flask_cors import CORS, cross_origin
 from redis import Redis
-from card_helper import format_cards, format_dropdown
+from card_helper import format_cards, format_dropdown, format_set_dropdown
 from redis_helper import (get_suggestions, get_all_editions, get_all_collections, get_collection,
                           add_card_to_redis, add_collection_to_redis)
 
@@ -49,7 +49,7 @@ def collections():
     """
     data = get_all_collections(REDIS)
     data_decoded = [byte.decode('utf-8') for byte in data]
-    return jsonify(format_dropdown(data_decoded))
+    return jsonify(format_set_dropdown(data_decoded))
 
 
 @app.route('/collection/<name>')

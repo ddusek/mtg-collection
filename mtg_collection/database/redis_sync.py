@@ -79,8 +79,8 @@ class RedisSyncDB():
             print(err)
             return None
 
-    def _set_as_object(self, edition):
-        """Return set object.
+    def _edition_as_object(self, edition):
+        """Return edition object.
         """
         try:
             key = f'edition:{edition["name"].lower().replace(":", ";")}'
@@ -98,16 +98,16 @@ class RedisSyncDB():
             print(err)
             return None
 
-    def _init_sets(self):
-        """Save all sets in db.
+    def _init_editions(self):
+        """Save all editions in db.
         """
         response = requests.get('https://api.scryfall.com/sets')
-        sets = response.json()
-        for _, edition in enumerate(sets['data']):
-            _set = self._set_as_object(edition)
-            if _set is None:
+        editions = response.json()
+        for _, value in enumerate(editions['data']):
+            edition = self._edition_as_object(value)
+            if edition is None:
                 continue
-            self._write_record(_set)
+            self._write_record(edition, 'edition')
         self.redis.bgsave()
         print('done sets')
 
@@ -119,20 +119,22 @@ class RedisSyncDB():
             self.__print_progress(i)
             card = self._card_as_object(line)
             if card is not None:
-                self._write_record(card)
+                self._write_record(card, 'card')
         self.redis.bgsave()
         print('done cards')
 
-    def _write_record(self, card):
+    def _write_record(self, obj, set_name=None):
         """Write record from json to database.
         """
-        self.redis.set(card.key, card.value)
+        self.redis.set(obj.key, obj.value)
+        if set_name is not None:
+            self.redis.sadd(set_name, obj.key)
 
     def _delete_by_pattern(self, pattern):
         """Delete all keys in given pattern.
         """
         matched_keys = []
-        cur = 1
+        cur = '0'
         while cur != 0:
             cur, keys = self.redis.scan(cur, pattern, 10000)
             matched_keys += keys
@@ -145,7 +147,7 @@ class RedisSyncDB():
         self._delete_by_pattern('edition:*')
         self._delete_by_pattern('card:*')
         self._init_cards()
-        self._init_sets()
+        self._init_editions()
         print('done init database')
 
 

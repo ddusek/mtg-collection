@@ -22,3 +22,15 @@ def format_dropdown(data):
         edition = ({'id': i, 'key': data, 'name': data_list[1]})
         editions.append(edition)
     return sorted(editions, key=lambda k: k['name'])
+
+
+def format_set_dropdown(keys):
+    """Format list of keys from Redis to dropdown menu.
+
+    :param data: Redis keys list.
+    """
+    dropdown_data = []
+    for i, data in enumerate(keys):
+        dictionary = ({'id': i, 'key': data, 'name': data})
+        dropdown_data.append(dictionary)
+    return sorted(dropdown_data, key=lambda k: k['name'])
