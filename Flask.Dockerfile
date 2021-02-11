@@ -12,6 +12,8 @@ COPY mtg_collection/api /app/api
 COPY requirements.txt /app/requirements.txt
 COPY scripts/flask-entrypoint.sh /app/flask-entrypoint.sh
 
+ENV PYTHONPATH=/app:$PYTHONPATH
+
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir --requirement /app/requirements.txt
 
