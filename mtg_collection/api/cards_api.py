@@ -1,18 +1,14 @@
 from flask import Flask, jsonify
 from flask_cors import CORS, cross_origin
 from redis import Redis
-from card_helper import format_cards, format_dropdown, format_set_dropdown
-from redis_helper import (get_suggestions, get_all_editions, get_all_collections, get_collection,
-                          add_card_to_redis, add_collection_to_redis)
-
-MAIN_REDIS_HOST = 'mtg-redis'
-MAIN_REDIS_PORT = 6379
-MAIN_REDIS_DB = 0
+from database import redis_helper
+import constants
 
 app = Flask(__name__)
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
-REDIS = Redis(host=MAIN_REDIS_HOST, port=MAIN_REDIS_PORT, db=MAIN_REDIS_DB)
+REDIS = Redis(host=constants.REDIS_HOSTNAME, port=constants.REDIS_PORT, db=constants.REDIS_MAIN_DB)
+# REDIS = Redis(host='0.0.0.0', port=6379, db=0)
 
 
 @app.route('/')
@@ -28,8 +24,8 @@ def hello_world():
 def suggest(text):
     """Return auto suggested cards.
     """
-    data = get_suggestions(REDIS, text, 20)
-    return jsonify(format_cards(data))
+    data = redis_helper.get_suggestions(REDIS, text, 20)
+    return jsonify(redis_helper.format_cards(data))
 
 
 @app.route('/editions')
@@ -37,9 +33,9 @@ def suggest(text):
 def editions():
     """Return all editions.
     """
-    data = get_all_editions(REDIS)
+    data = redis_helper.get_all_editions(REDIS)
     data_decoded = [byte.decode('utf-8') for byte in data]
-    return jsonify(format_dropdown(data_decoded))
+    return jsonify(redis_helper.format_dropdown(data_decoded))
 
 
 @app.route('/collections')
@@ -47,9 +43,10 @@ def editions():
 def collections():
     """Return all collections.
     """
-    data = get_all_collections(REDIS)
+    print(Redis)
+    data = redis_helper.get_all_collections(REDIS)
     data_decoded = [byte.decode('utf-8') for byte in data]
-    return jsonify(format_set_dropdown(data_decoded))
+    return jsonify(redis_helper.format_set_dropdown(data_decoded))
 
 
 @app.route('/collection/<name>')
@@ -57,7 +54,7 @@ def collections():
 def collection(name):
     """Return all cards from collection by its name.
     """
-    data = get_collection(REDIS, name)
+    data = redis_helper.get_collection(REDIS, name)
     data_decoded = [byte.decode('utf-8') for byte in data]
     return jsonify(data_decoded)
 
@@ -67,7 +64,7 @@ def collection(name):
 def add_card(collection, card, units):
     """Add card to collection.
     """
-    return jsonify(add_card_to_redis(REDIS, collection, card, units))
+    return jsonify(redis_helper.add_card_to_redis(REDIS, collection, card, units))
 
 
 @app.route('/remove/<collection>/<card>/<units>')
@@ -83,4 +80,4 @@ def remove_card(collection, card, units):
 def add_collection(collection):
     """Add new collection.
     """
-    return jsonify(add_collection_to_redis(REDIS, collection))
+    return jsonify(redis_helper.add_collection_to_redis(REDIS, collection))

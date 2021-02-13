@@ -17,16 +17,15 @@ My cards
 <collection_name>:<name>, <dictinary_values>
 """
 import json
-from pathlib import Path
 from redis import Redis
 import requests
+import constants
 
 
 class Synchronize():
     """Init or sync Redis database from json file.
     """
-    file_path = "../fetch/json_cards.json"
-    editions_url = 'https://api.scryfall.com/sets'
+    editions_url = constants.SCRYFALL_EDITIONS_URL
 
     def __init__(self, host, port, db):
         self.redis = Redis(host=host, port=port, db=db)
@@ -35,8 +34,7 @@ class Synchronize():
     def _json_to_dict(self):
         """Get file into list of every line.
         """
-        path = Path(__file__).parent / self.file_path
-        with open(path, 'r') as file:
+        with open(constants.SCRYFALL_CARDS_JSON_PATH, 'r') as file:
             self.cards = json.load(file)
 
     def _filter_card_fields(self, card):
@@ -71,7 +69,7 @@ class Synchronize():
         editions = response.json()
         for edition in editions['data']:
             if edition is not None:
-                self._write_record(self._filter_edition_fields(edition), 'edition')
+                self._write_record(self._filter_edition_fields(edition), 'editions')
         self.redis.bgsave()
         print('done sets')
 
@@ -123,5 +121,5 @@ class RedisSyncCollections():
         self.redis = Redis(host=host, port=port, db=db)
 
 
-synchronizer = Synchronize(host='0.0.0.0', port=6379, db=0)
+synchronizer = Synchronize(host=constants.REDIS_HOST, port=constants.REDIS_PORT, db=constants.REDIS_MAIN_DB)
 synchronizer.init_db()

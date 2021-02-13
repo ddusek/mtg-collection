@@ -27,6 +27,8 @@ services:
       - mtg
     volumes:
       - ./mtg_collection/api:/app/api
+      - ./mtg_collection/database:/app/database
+      - ./mtg_collection/data:/app/data
     env_file:
       - dev.env
     depends_on:
