@@ -10,9 +10,16 @@
       </span>
     </div>
     <div class="synchronize__bottom">
-      <span>progress bar</span>
-      <span v-if="downloadInProgress">downloading new file...</span>
-      <span v-if="syncInProgress">Synchronizing database...</span>
+      <span class="synchronize__bottom__text" v-if="downloadInProgress"
+        >downloading new file...</span
+      >
+      <span class="synchronize__bottom__text synchronize__bottom__text--error" v-if="downloadError"
+        >There was some error downloading file.</span
+      >
+      <span class="synchronize__bottom__text" v-if="syncInProgress">Synchronizing database...</span>
+      <span class="synchronize__bottom__text synchronize__bottom__text--error" v-if="syncError"
+        >There was some error synchronizing database.</span
+      >
     </div>
   </div>
 </template>
@@ -24,18 +31,20 @@ export default {
   data() {
     return {
       downloadInProgress: false,
+      downloadError: false,
       syncInProgress: false,
+      syncError: false,
     };
   },
   methods: {
-    downloadFile() {
+    async downloadFile() {
       this.downloadInProgress = true;
-      api.downloadCards();
+      this.downloadError = !(await api.downloadCards());
       this.downloadInProgress = false;
     },
-    syncDatabase() {
+    async syncDatabase() {
       this.syncInProgress = true;
-      api.syncDatabaseFromFile();
+      this.syncError = !(await api.syncDatabaseFromFile());
       this.syncInProgress = false;
     },
   },
@@ -76,6 +85,14 @@ export default {
     flex-direction: column;
     margin-top: 10px;
     background-color: rgb(55, 55, 55);
+
+    &__text {
+      font-size: 22px;
+
+      &--error {
+        background-color: red;
+      }
+    }
   }
 }
 </style>

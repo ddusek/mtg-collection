@@ -17,9 +17,12 @@ My cards
 <collection_name>:<name>, <dictinary_values>
 """
 import json
-from redis import Redis
+import os
 import requests
+from redis import Redis
 from mtg_collection import constants
+
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 class Synchronizer():
@@ -34,7 +37,7 @@ class Synchronizer():
     def _json_to_dict(self):
         """Get file into list of every line.
         """
-        with open(constants.SCRYFALL_CARDS_JSON_PATH, 'r') as file:
+        with open(os.path.join(ROOT_DIR, constants.SCRYFALL_CARDS_JSON_PATH), 'r') as file:
             self.cards = json.load(file)
 
     def _filter_card_fields(self, card):
@@ -71,7 +74,6 @@ class Synchronizer():
             if edition is not None:
                 self._write_record(self._filter_edition_fields(edition), 'editions')
         self.redis.bgsave()
-        print('done sets')
 
     def _init_cards(self):
         """Save all cards in db.
@@ -112,7 +114,6 @@ class Synchronizer():
             self._delete_by_pattern('card:*')
             self._init_cards()
             self._init_editions()
-            print('done init database')
             return True
         except Exception:
             return False

@@ -44,7 +44,6 @@ def editions():
 def collections():
     """Return all collections.
     """
-    print(Redis)
     data = redis_helper.get_all_collections(REDIS)
     data_decoded = [byte.decode('utf-8') for byte in data]
     return jsonify(redis_helper.format_set_dropdown(data_decoded))
