@@ -7,6 +7,7 @@
       <div>
         <CardForm />
         <CollectionForm />
+        <Synchronize />
       </div>
       <CardsList />
     </div>
@@ -17,8 +18,9 @@
 import CardForm from './components/CardForm';
 import CollectionForm from './components/CollectionForm';
 import CardsList from './components/CardsList';
+import Synchronize from './components/Synchronize';
 
 export default {
-  components: { CardForm, CollectionForm, CardsList },
+  components: { CardForm, CollectionForm, CardsList, Synchronize },
 };
 </script>

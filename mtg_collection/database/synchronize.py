@@ -19,16 +19,16 @@ My cards
 import json
 from redis import Redis
 import requests
-import constants
+from mtg_collection import constants
 
 
-class Synchronize():
+class Synchronizer():
     """Init or sync Redis database from json file.
     """
     editions_url = constants.SCRYFALL_EDITIONS_URL
 
-    def __init__(self, host, port, db):
-        self.redis = Redis(host=host, port=port, db=db)
+    def __init__(self, redis):
+        self.redis = redis
         self.cards = []
 
     def _json_to_dict(self):
@@ -104,14 +104,18 @@ class Synchronize():
             for key in matched_keys:
                 self.redis.delete(key)
 
-    def init_db(self):
-        """Initialize Redis database and load all cards.
+    def synchronize_database(self):
+        """Synchronize cards and editions in database with a file.
         """
-        self._delete_by_pattern('edition:*')
-        self._delete_by_pattern('card:*')
-        self._init_cards()
-        self._init_editions()
-        print('done init database')
+        try:
+            self._delete_by_pattern('edition:*')
+            self._delete_by_pattern('card:*')
+            self._init_cards()
+            self._init_editions()
+            print('done init database')
+            return True
+        except Exception:
+            return False
 
 
 class RedisSyncCollections():
@@ -119,7 +123,3 @@ class RedisSyncCollections():
     """
     def __init__(self, host, port, db):
         self.redis = Redis(host=host, port=port, db=db)
-
-
-synchronizer = Synchronize(host=constants.REDIS_HOST, port=constants.REDIS_PORT, db=constants.REDIS_MAIN_DB)
-synchronizer.init_db()

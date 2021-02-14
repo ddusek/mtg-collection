@@ -72,10 +72,40 @@ const addCollection = async (collection) => {
         });
 };
 
+const downloadCards = async () => {
+    axios.defaults.xsrfCookieName = 'csrftoken';
+    axios.defaults.xsrfHeaderName = 'X-CSRFTOKEN';
+    return axios
+        .get(`${APIURL}/download/scryfall/cards`)
+        .then((response) => {
+            return response.data.success;
+        })
+        .catch((error) => {
+            console.log(error);
+            return null;
+        });
+};
+
+const syncDatabaseFromFile = async () => {
+    axios.defaults.xsrfCookieName = 'csrftoken';
+    axios.defaults.xsrfHeaderName = 'X-CSRFTOKEN';
+    return axios
+        .get(`${APIURL}/synchronize/scryfall/cards`)
+        .then((response) => {
+            return response.data.success;
+        })
+        .catch((error) => {
+            console.log(error);
+            return null;
+        });
+};
+
 export default {
     getCardSuggestions,
     getAllEditions,
     getAllCollections,
     addCard,
     addCollection,
+    downloadCards,
+    syncDatabaseFromFile,
 };

@@ -26,9 +26,9 @@ services:
     networks:
       - mtg
     volumes:
-      - ./mtg_collection/api:/app/api
-      - ./mtg_collection/database:/app/database
-      - ./mtg_collection/data:/app/data
+      - ./mtg_collection/api:/mtg_collection/api
+      - ./mtg_collection/database:/mtg_collection/database
+      - ./mtg_collection/data:/mtg_collection/data
     env_file:
       - dev.env
     depends_on:

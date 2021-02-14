@@ -1,14 +1,15 @@
 from flask import Flask, jsonify
 from flask_cors import CORS, cross_origin
 from redis import Redis
-from database import redis_helper
-import constants
+from mtg_collection import constants
+from mtg_collection.database import redis_helper
+from mtg_collection.database import download
+from mtg_collection.database import synchronize
 
 app = Flask(__name__)
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 REDIS = Redis(host=constants.REDIS_HOSTNAME, port=constants.REDIS_PORT, db=constants.REDIS_MAIN_DB)
-# REDIS = Redis(host='0.0.0.0', port=6379, db=0)
 
 
 @app.route('/')
@@ -81,3 +82,21 @@ def add_collection(collection):
     """Add new collection.
     """
     return jsonify(redis_helper.add_collection_to_redis(REDIS, collection))
+
+
+@app.route('/download/scryfall/cards')
+@cross_origin()
+def download_scryfall_cards():
+    """Download cards bulk data from Scryfall.
+    """
+    result = download.Downloader().download_scryfall_cards()
+    return jsonify({'success': result})
+
+
+@app.route('/synchronize/scryfall/cards')
+@cross_origin()
+def synchronize_scryfall_cards():
+    """Synchronize cards from Scryfall to redis.
+    """
+    result = synchronize.Synchronizer(REDIS).synchronize_database()
+    return jsonify({'success': result})
