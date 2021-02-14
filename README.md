@@ -1,35 +1,20 @@
 # MTG_Collection
 
-## How to run
+## How to run dev
 
-### 1. Fetch all cards json file.
+### 1. Install and start Docker
 
-`python main.py fetchcards`
+### 2. Start app
+`docker-compose up --build`
 
-### 2. Start redis
-`redis-server redis.conf`
+### 3. Initialize database
+Database is loaded from .rdb file in /mtg_collection/data/.  
+If this file is missing, you need to init db first.  
+* At first run, you need to download json file containing all mtg cards, you can do it by clicking 'Download data' button.
+* After downloading file, initialize database by clicking 'Synchronize database' button.
 
-### 3. Fill database
-Databases are loaded from .rdb files.  
+## How does it work
+TODO: Create collection -> add cards -> check prices etc.
 
-If these files are missing, you need to init db first.  
-`python main.py initdb`
-
-### 4. Start dev vue app
-in /frontend  
-`npm run dev`
-
-### 5. Start Flask
-in /mtg_collection  
-`export FLASK_APP=api/cards_api.py`  
-`flask run --debugger`
-
-
-Main database - dump_main.rdb.  
-Collections databases - dump_<collection_name>.rdb.
-
-
-### TODO
-use generator for reading line by line  
-dockerize app  
-create all needed directories/files on init (logs dir)  
+## Backup
+TODO: save to csv/json then import from that.
