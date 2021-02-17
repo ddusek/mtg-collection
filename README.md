@@ -18,3 +18,22 @@ TODO: Create collection -> add cards -> check prices etc.
 
 ## Backup
 TODO: save to csv/json then import from that.
+
+## Redis structure - TODO
+
+Database currently contains all cards, all sets and all created collections.
+
+
+key, value
+
+cards
+card:<edition>:<name>, <dictionary_values>
+
+sets
+edition:<edition>, <dictionary_values>
+
+my collections
+collection:<collection_name>, <collection_name>
+
+My cards
+<collection_name>:<name>, <dictinary_values>

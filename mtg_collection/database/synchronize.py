@@ -1,21 +1,3 @@
-"""Redis structure
-Database currently contains all cards, all sets and all created collections.
-
-
-key, value
-
-cards
-card:<edition>:<name>, <dictionary_values>
-
-sets
-edition:<edition>, <dictionary_values>
-
-my collections
-collection:<collection_name>, <collection_name>
-
-My cards
-<collection_name>:<name>, <dictinary_values>
-"""
 import json
 import os
 import requests
@@ -26,7 +8,7 @@ ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 class Synchronizer():
-    """Init or sync Redis database from json file.
+    """Init or synchronize Redis database from json file.
     """
     editions_url = constants.SCRYFALL_EDITIONS_URL
 
@@ -34,14 +16,19 @@ class Synchronizer():
         self.redis = redis
         self.cards = []
 
-    def _json_to_dict(self):
-        """Get file into list of every line.
+    def _json_to_dict(self) -> None:
+        """Get json file into python dict.
         """
         with open(os.path.join(ROOT_DIR, constants.SCRYFALL_CARDS_JSON_PATH), 'r') as file:
             self.cards = json.load(file)
 
-    def _filter_card_fields(self, card):
+    def _filter_card_fields(self, card: dict) -> dict:
         """Create card key and get only wanted card fields as value.
+
+        :param card: Card object to get fields from.
+        :type card: dict
+        :return: New card object to be saved in database.
+        :rtype: dict
         """
         key = f'card:{card["set_name"].lower().replace(":", ";")}: \
         {card["name"].lower().replace(":", ";")}'
@@ -52,11 +39,17 @@ class Synchronizer():
             'price_foil': card['prices']['usd_foil'],
             'release': card['released_at'],
         }
-        return ({'key': key, 'value': values})
+        return {'key': key, 'value': values}
 
-    def _filter_edition_fields(self, edition):
+    def _filter_edition_fields(self, edition: dict) -> dict:
         """Create edition key and get only wanted edition fields as value.
+
+        :param edition: Edition object to get fields from.
+        :type edition: dict
+        :return: new Edition object to be saved in database.
+        :rtype: dict
         """
+        # replace ':' because its used as key parts separator in Redis.
         key = f'edition:{edition["name"].lower().replace(":", ";")}'
         values = {
             'image': edition['icon_svg_uri'],
@@ -65,8 +58,8 @@ class Synchronizer():
         }
         return ({'key': key, 'value': values})
 
-    def _init_editions(self):
-        """Save all editions in db.
+    def _init_editions(self) -> None:
+        """Save all editions in database.
         """
         response = requests.get(self.editions_url)
         editions = response.json()
@@ -75,8 +68,8 @@ class Synchronizer():
                 self._write_record(self._filter_edition_fields(edition), 'editions')
         self.redis.bgsave()
 
-    def _init_cards(self):
-        """Save all cards in db.
+    def _init_cards(self) -> None:
+        """Save all cards in database.
         """
         self._json_to_dict()
         for card in self.cards:
@@ -84,18 +77,23 @@ class Synchronizer():
                 self._write_record(self._filter_card_fields(card), 'card')
         self.redis.bgsave()
 
-    def _write_record(self, obj, set_name=None):
+    def _write_record(self, obj: dict, set_name: str = None) -> None:
         """Write record from json to database.
 
         :param obj: obj to write.
+        :type obj: dict
         :param set_name: if not None, add obj['key'] to this set. Defaults to None
+        :type set_name: str, optional
         """
         self.redis.set(obj['key'], json.dumps(obj['value']))
         if set_name is not None:
             self.redis.sadd(set_name, obj['key'])
 
-    def _delete_by_pattern(self, pattern):
+    def _delete_by_pattern(self, pattern: str) -> None:
         """Delete all keys in given pattern.
+
+        :param pattern: pattern to match keys from.
+        :type pattern: str
         """
         matched_keys = []
         cur = '0'
@@ -106,8 +104,11 @@ class Synchronizer():
             for key in matched_keys:
                 self.redis.delete(key)
 
-    def synchronize_database(self):
+    def synchronize_database(self) -> bool:
         """Synchronize cards and editions in database with a file.
+
+        :return: True if success.
+        :rtype: bool
         """
         try:
             self._delete_by_pattern('edition:*')
@@ -117,10 +118,3 @@ class Synchronizer():
             return True
         except Exception:
             return False
-
-
-class RedisSyncCollections():
-    """Sync collections prices.
-    """
-    def __init__(self, host, port, db):
-        self.redis = Redis(host=host, port=port, db=db)

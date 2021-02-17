@@ -7,10 +7,15 @@ ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 class Downloader():
-    """Download files needed for this application.
+    """Download files needed for this application to run properly.
     """
-    def _download_file(self, url, filename):
+    def _download_file(self, url: str, filename: str) -> None:
         """Download and write into a file.
+
+        :param url: Url from where to download file.
+        :type url: str
+        :param filename: Filename of saved file.
+        :type filename: str
         """
         with requests.get(url, stream=True) as response:
             # total_size_in_bytes = int(response.headers.get('content-length', 0))
@@ -20,8 +25,11 @@ class Downloader():
                 for chunk in response.iter_content(chunk_size=1024000):
                     json_file.write(chunk)
 
-    def download_scryfall_cards(self):
+    def download_scryfall_cards(self) -> bool:
         """Fetch all cards bulk data from Scryfall.
+
+        :return: True if downloaded successfully.
+        :rtype: bool
         """
         response = requests.get(constants.SCRYFALL_BULK_URL)
         cards = json.loads(response.text)
