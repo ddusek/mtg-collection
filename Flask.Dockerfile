@@ -1,4 +1,4 @@
-FROM python:3.8-buster
+FROM python:3.9-buster
 
 # Prevents Python from buffering stdout and stderr (equivalent to python -u option)
 ENV PYTHONUNBUFFERED=TRUE

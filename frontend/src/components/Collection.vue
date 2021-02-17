@@ -28,7 +28,7 @@
           </tr>
         </tfoot>
         <tbody>
-          <tr v-for="card in collectionCards" :key="card">
+          <tr v-for="card in collectionCards" :key="card.id">
             <td>{{ card.name }}</td>
             <td>{{ card.set }}</td>
             <td>{{ card.price }}</td>

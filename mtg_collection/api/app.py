@@ -57,8 +57,13 @@ def collection(name):
     """
     data = redis_helper.get_collection(REDIS, name)
     data_decoded = [json.loads(byte.decode('utf-8')) for byte in data]
-    print(data_decoded)
-    return jsonify(data_decoded)
+
+    indexed = []
+    # Add index, so there is a better value to set as key in Vue loops.
+    for i, item in enumerate(data_decoded):
+        item['id'] = i
+        indexed.append(item)
+    return jsonify(indexed)
 
 
 @app.route('/add/<collection>/<card>/<units>', methods=['POST'])
