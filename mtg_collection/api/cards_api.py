@@ -1,3 +1,4 @@
+import json
 from flask import Flask, jsonify
 from flask_cors import CORS, cross_origin
 from redis import Redis
@@ -55,7 +56,8 @@ def collection(name):
     """Return all cards from collection by its name.
     """
     data = redis_helper.get_collection(REDIS, name)
-    data_decoded = [byte.decode('utf-8') for byte in data]
+    data_decoded = [json.loads(byte.decode('utf-8')) for byte in data]
+    print(data_decoded)
     return jsonify(data_decoded)
 
 

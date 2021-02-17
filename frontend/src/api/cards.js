@@ -3,8 +3,6 @@ import axios from 'axios';
 const APIURL = 'http://localhost:5000';
 
 const getCardSuggestions = async (input) => {
-    axios.defaults.xsrfCookieName = 'csrftoken';
-    axios.defaults.xsrfHeaderName = 'X-CSRFTOKEN';
     return axios
         .get(`${APIURL}/suggest/${input}`)
         .then((response) => {
@@ -17,8 +15,6 @@ const getCardSuggestions = async (input) => {
 };
 
 const getAllEditions = async () => {
-    axios.defaults.xsrfCookieName = 'csrftoken';
-    axios.defaults.xsrfHeaderName = 'X-CSRFTOKEN';
     return axios
         .get(`${APIURL}/editions`)
         .then((response) => {
@@ -31,8 +27,6 @@ const getAllEditions = async () => {
 };
 
 const getAllCollections = async () => {
-    axios.defaults.xsrfCookieName = 'csrftoken';
-    axios.defaults.xsrfHeaderName = 'X-CSRFTOKEN';
     return axios
         .get(`${APIURL}/collections`)
         .then((response) => {
@@ -44,9 +38,19 @@ const getAllCollections = async () => {
         });
 };
 
+const getCollectionCards = async (name) => {
+    return axios
+        .get(`${APIURL}/collection/${name}`)
+        .then((response) => {
+            return response.data;
+        })
+        .catch((error) => {
+            console.log(error);
+            return null;
+        });
+};
+
 const addCard = async (collection, card, units) => {
-    axios.defaults.xsrfCookieName = 'csrftoken';
-    axios.defaults.xsrfHeaderName = 'X-CSRFTOKEN';
     return axios
         .post(`${APIURL}/add/${collection}/${card}/${units}`)
         .then((response) => {
@@ -59,8 +63,6 @@ const addCard = async (collection, card, units) => {
 };
 
 const addCollection = async (collection) => {
-    axios.defaults.xsrfCookieName = 'csrftoken';
-    axios.defaults.xsrfHeaderName = 'X-CSRFTOKEN';
     return axios
         .post(`${APIURL}/add/${collection}`)
         .then((response) => {
@@ -73,8 +75,6 @@ const addCollection = async (collection) => {
 };
 
 const downloadCards = async () => {
-    axios.defaults.xsrfCookieName = 'csrftoken';
-    axios.defaults.xsrfHeaderName = 'X-CSRFTOKEN';
     return axios
         .get(`${APIURL}/download/scryfall/cards`)
         .then((response) => {
@@ -87,8 +87,6 @@ const downloadCards = async () => {
 };
 
 const syncDatabaseFromFile = async () => {
-    axios.defaults.xsrfCookieName = 'csrftoken';
-    axios.defaults.xsrfHeaderName = 'X-CSRFTOKEN';
     return axios
         .get(`${APIURL}/synchronize/scryfall/cards`)
         .then((response) => {
@@ -104,6 +102,7 @@ export default {
     getCardSuggestions,
     getAllEditions,
     getAllCollections,
+    getCollectionCards,
     addCard,
     addCollection,
     downloadCards,

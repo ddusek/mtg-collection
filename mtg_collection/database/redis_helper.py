@@ -74,13 +74,15 @@ def get_all_collections(redis):
 def get_collection(redis, name):
     """Get all cards from collection.
     """
-    return _get_matches(redis, f'collection:{name}:*')
+    print(name)
+    keys = _get_matches(redis, f'collection:{name}:*')
+    return redis.mget(keys)
 
 
 def add_card_to_redis(redis, collection, card, units):
     """Add card and its units to a collection.
     """
-    key = f'{collection}:{card}:{units}'
+    key = f'collection:{collection}:{card}:{units}'
     value = redis.get(card)
     return {'success': redis.set(key, value) if value else False}
 

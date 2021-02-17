@@ -28,20 +28,20 @@ export default {
   computed: {
     name: {
       get() {
-        return this.$store.state.collectionForm.name;
+        return this.$store.state.collection.name;
       },
       set(value) {
-        this.$store.dispatch('collectionForm/updateName', value);
+        this.$store.dispatch('collection/updateName', value);
       },
     },
     showMsg: {
       get() {
-        return this.$store.state.collectionForm.showMsg;
+        return this.$store.state.collection.showMsg;
       },
     },
     msgType: {
       get() {
-        return this.$store.state.collectionForm.msgType;
+        return this.$store.state.collection.msgType;
       },
     },
     msg: {
@@ -57,7 +57,7 @@ export default {
   methods: {
     ...mapActions({
       addCollection(dispatch) {
-        dispatch('collectionForm/addCollection', this.name);
+        dispatch('collection/addCollection', this.name);
       },
     }),
   },

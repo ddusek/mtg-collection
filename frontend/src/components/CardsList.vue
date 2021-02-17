@@ -9,7 +9,7 @@
       <label
         class="suggestions__card--name"
         :class="{
-          'suggestions__card--highlighted': $store.state.cardForm.inputName == card.name,
+          'suggestions__card--highlighted': $store.state.card.inputName == card.name,
         }"
       >
         {{ card.name }}
@@ -31,7 +31,7 @@ export default {
   methods: {
     ...mapActions({
       updateName(dispatch, value) {
-        dispatch('cardForm/updateName', value);
+        dispatch('card/updateName', value);
       },
     }),
   },

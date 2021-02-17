@@ -40,7 +40,7 @@
         <select v-model="selected_collection" id="collection" class="form__input--dropdown">
           <option
             v-for="collection in all_collections"
-            v-bind:value="collection.key"
+            :value="collection.key"
             :key="collection.id"
           >
             {{ collection.name }}
@@ -61,52 +61,52 @@ export default {
   computed: {
     name: {
       get() {
-        return this.$store.state.cardForm.cardName;
+        return this.$store.state.card.cardName;
       },
       set(value) {
-        this.$store.dispatch('cardForm/updateName', value);
+        this.$store.dispatch('card/updateName', value);
       },
     },
     all_editions: {
       get() {
-        return this.$store.state.cardForm.allEditions;
+        return this.$store.state.card.allEditions;
       },
     },
     all_collections: {
       get() {
-        return this.$store.state.cardForm.allCollections;
+        return this.$store.state.card.allCollections;
       },
     },
     selected_edition: {
       get() {
-        return this.$store.state.cardForm.editionName;
+        return this.$store.state.card.editionName;
       },
       set(value) {
-        this.$store.dispatch('cardForm/updateEdition', value);
+        this.$store.dispatch('card/updateEdition', value);
       },
     },
     foil: {
       get() {
-        return this.$store.state.cardForm.foil;
+        return this.$store.state.card.foil;
       },
       set(value) {
-        this.$store.dispatch('cardForm/updateFoil', value);
+        this.$store.dispatch('card/updateFoil', value);
       },
     },
     units: {
       get() {
-        return this.$store.state.cardForm.units;
+        return this.$store.state.card.units;
       },
       set(value) {
-        this.$store.dispatch('cardForm/updateUnits', value);
+        this.$store.dispatch('card/updateUnits', value);
       },
     },
     selected_collection: {
       get() {
-        return this.$store.state.cardForm.collectionName;
+        return this.$store.state.card.collectionName;
       },
       set(value) {
-        this.$store.dispatch('cardForm/updateCollection', value);
+        this.$store.dispatch('card/updateCollection', value);
       },
     },
   },
@@ -116,13 +116,13 @@ export default {
         dispatch('suggest/getSuggestions', { cardName: this.name });
       },
       getAllEditions(dispatch) {
-        dispatch('cardForm/getAllEditions');
+        dispatch('card/getAllEditions');
       },
       getAllCollections(dispatch) {
-        dispatch('cardForm/getAllCollections');
+        dispatch('card/getAllCollections');
       },
       addCard(dispatch) {
-        dispatch('cardForm/addCard', {
+        dispatch('card/addCard', {
           collection: this.selected_collection,
           card: this.name,
           units: this.units,

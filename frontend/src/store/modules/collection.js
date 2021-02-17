@@ -4,6 +4,7 @@ const state = () => ({
     name: '',
     showMsg: false,
     msgType: '',
+    collectionCards: [],
 });
 
 const getters = {};
@@ -16,8 +17,9 @@ const actions = {
         let data = await api.addCollection(payload);
         commit('setShowMessage', data);
     },
-    async showMessage({ commit }) {
-        commit('setShowMessage');
+    async getCollectionCards({ commit }, payload) {
+        let data = await api.getCollectionCards(payload);
+        commit('setCollectionCards', data);
     },
 };
 
@@ -35,6 +37,9 @@ const mutations = {
         setTimeout(() => {
             state.showMsg = false;
         }, 3000);
+    },
+    setCollectionCards(state, payload) {
+        state.collectionCards = payload;
     },
 };
 
