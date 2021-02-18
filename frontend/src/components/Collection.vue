@@ -11,7 +11,7 @@
       </option>
     </select>
     <div>
-      <table>
+      <table v-if="hasCards">
         <thead>
           <tr>
             <th>Card name</th>
@@ -23,8 +23,8 @@
         </thead>
         <tfoot>
           <tr>
-            <td colspan="4">total</td>
-            <td>9999</td>
+            <td colspan="2">total</td>
+            <td colspan="3">9999</td>
           </tr>
         </tfoot>
         <tbody>
@@ -67,6 +67,11 @@ export default {
         this.$store.dispatch('collection/setCollectionCards', value);
       },
     },
+    hasCards: {
+      get() {
+        return this.collectionCards.length;
+      },
+    },
   },
   methods: {
     ...mapActions({
@@ -79,7 +84,7 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .collection {
   table {
     border: 1px solid black;
