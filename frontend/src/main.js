@@ -3,10 +3,10 @@ import VueRouter from 'vue-router';
 import App from './App.vue';
 import store from './store';
 import './styles/main.scss';
-import Home from './components/Home';
-import Collections from './components/Collections';
-import AddCollection from './components/AddCollection';
-import AddCard from './components/AddCard';
+import Home from './components/PageHome';
+import Collections from './components/PageCollections';
+import AddCollection from './components/PageAddCollection';
+import AddCard from './components/PageAddCard';
 
 Vue.use(VueRouter);
 
