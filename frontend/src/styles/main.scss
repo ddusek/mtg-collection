@@ -1,37 +1,53 @@
 @import './_variables';
-@import './layout';
 
 @font-face {
-    font-family: 'Vinson';
-    src: url('../fonts/VInson-Regular.ttf') format('truetype');
-    font-weight: 600;
-    font-style: normal;
-}
-@font-face {
-    font-family: 'Vinson-Bold';
-    src: url('../fonts/Vinson-Bold.ttf') format('truetype');
-    font-weight: 800;
-    font-style: bold;
-}
-@font-face {
-    font-family: 'Vinson-Light';
-    src: url('../fonts/Vinson-Light.ttf') format('truetype');
+    font-family: 'Saros';
+    src: url('../fonts/Saros-Regular.ttf') format('truetype');
     font-weight: 200;
     font-style: normal;
 }
 
 html {
-    font-family: 'Vinson', Arial, Helvetica, sans-serif;
     height: 100%;
-    background-color: rgb(85, 85, 85);
-    color: $base-text-color;
+    background-color: $background-color;
+    color: $primary-text-color;
 }
 
 body {
     margin: 0;
+    *:not(i){
+        font-family:Saros, Arial, Helvetica, Sans-serif;
+    }
 }
 
 a {
-    color: $base-text-color;
+    color: $primary-text-color;
     text-decoration: none;
+}
+
+#main {
+    margin: 0 20px;
+    display: flex;
+    justify-content: center;
+}
+
+h2 {
+    background-color: $highlight-color;
+    font-size: 28px;
+    width: 100%;
+    text-align: center;
+    padding: 12px 0 12px 0;
+    margin: 0 0 20px 0;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
 }

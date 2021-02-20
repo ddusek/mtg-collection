@@ -30,10 +30,26 @@
           id="cardUnits"
           type="number"
           v-model="units"
-          class="form__input--textbox"
+          class="form__input--textbox form__input--textbox__number"
           min="1"
           max="999"
         />
+        <div class="form__input__edit">
+          <button
+            class="form__input__edit__button form__input__edit__button--increment"
+            v-on:click="units++"
+            :disabled="units >= 999"
+          >
+            ▲
+          </button>
+          <button
+            class="form__input__edit__button form__input__edit__button--decrement"
+            v-on:click="units--"
+            :disabled="units <= 1"
+          >
+            ▼
+          </button>
+        </div>
       </div>
       <div class="form__input">
         <label>Collection</label>
@@ -47,7 +63,7 @@
           </option>
         </select>
       </div>
-      <div class="form__submit">
+      <div class="form__input form__submit">
         <input type="submit" class="form__submit__button" value="Add" />
       </div>
     </form>
@@ -138,62 +154,92 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import '../styles/_variables';
+
 .container {
+  background-color: $background-color-medium;
   display: flex;
-  align-items: center;
   flex-direction: column;
   width: 500px;
-  height: 440px;
-  background-color: rgb(55, 55, 55);
-  font-size: 22px;
-  margin-right: 100px;
-  margin-bottom: 100px;
+}
+.form {
+  background-color: $background-color-medium;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0 30px;
+  overflow: auto;
 
-  h2 {
-    background-color: rgb(25, 25, 25);
+  &__input {
+    height: 50px;
+    margin-bottom: 10px;
     width: 100%;
-    text-align: center;
-    margin: 0 0 20px 0;
-    padding: 12px 0 5px 0;
-  }
-
-  .form {
-    width: 90%;
     display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
+    align-items: flex-start;
+    input {
+      margin: 0;
+      border: 0;
+      padding: 0;
+    }
 
-    &__input {
-      height: 50px;
-      margin: 0 0 10px 0;
-      width: 100%;
+    &--textbox {
+      height: 30px;
+      width: 250px;
+      border-radius: 5px;
+
+      &__number {
+        width: 215px;
+        height: 36px;
+        padding-right: 5px;
+        border-radius: 5px 0 0 5px;
+      }
+    }
+
+    &--dropdown {
+      height: 30px;
+      width: 250px;
+      border-radius: 5px;
+    }
+
+    &--checkbox {
+      width: 20px;
+      height: 20px;
+    }
+
+    label {
+      width: 25%;
+    }
+
+    &__edit {
       display: flex;
-      align-items: flex-start;
+      flex-direction: column;
 
-      &--textbox {
-        height: 25px;
-        width: 250px;
+      button:hover {
+        background-color: $highlight-color;
       }
-
-      &--checkbox {
-        width: 20px;
-        height: 20px;
-      }
-
-      label {
-        width: 25%;
-        padding-right: 25px;
-      }
-    }
-    &__submit {
-      margin: 0 0 15px 0;
-
       &__button {
-        min-width: 350px;
-        min-height: 40px;
+        height: 18px;
+        width: 30px;
+        padding: 0;
+        border: 0;
+        background-color: #ffffff;
+
+        &--increment {
+          border-radius: 0 6px 0 0;
+        }
+        &--decrement {
+          border-radius: 0 0 6px 0;
+        }
       }
     }
+  }
+  &__submit {
+    margin: 0 0 15px 0;
+
+    &__button {
+      min-width: 350px;
+      min-height: 40px;
+      border-radius: 5px;
+}
   }
 }
 </style>

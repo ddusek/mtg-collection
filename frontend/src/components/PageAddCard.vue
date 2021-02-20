@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="container">
     <div>
       <CardForm />
     </div>
@@ -16,4 +16,8 @@ export default {
 };
 </script>
 
-<style></style>
+<style lang="scss" scoped>
+.container {
+  display: flex;
+}
+</style>

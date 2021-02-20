@@ -58,7 +58,6 @@ export default {
   height: 110px;
   display: flex;
   flex-direction: column;
-  border: 2px red solid;
   text-align: center;
 
   &__top {
