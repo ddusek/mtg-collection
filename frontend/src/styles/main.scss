@@ -51,3 +51,8 @@ input::-webkit-inner-spin-button {
 input[type=number] {
   -moz-appearance: textfield;
 }
+
+:focus {
+      outline-color: $highlight-color;
+      outline-style: solid;
+    }

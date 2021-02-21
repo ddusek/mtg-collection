@@ -22,7 +22,14 @@
       </div>
       <div class="form__input">
         <label>Is foil</label>
-        <input class="form__input--checkbox" v-model="foil" type="checkbox" id="checkbox" />
+        <div class="form__input--checkbox">
+          <input
+            class="form__input--checkbox regular-checkbox"
+            v-model="foil"
+            type="checkbox"
+            id="checkbox"
+          />
+        </div>
       </div>
       <div class="form__input">
         <label>Units</label>
@@ -160,7 +167,7 @@ export default {
   background-color: $background-color-medium;
   display: flex;
   flex-direction: column;
-  width: 500px;
+  width: 450px;
 }
 .form {
   background-color: $background-color-medium;
@@ -172,24 +179,30 @@ export default {
   &__input {
     height: 50px;
     margin-bottom: 10px;
+    margin-top: 5px;
     width: 100%;
     display: flex;
     align-items: flex-start;
+    justify-content: center;
     input {
       margin: 0;
       border: 0;
-      padding: 0;
+    }
+    :focus {
+      outline: 0;
+      box-shadow: 0 0 3pt 2pt $highlight-color;
+      border: 0;
     }
 
     &--textbox {
       height: 30px;
-      width: 250px;
+      width: 240px;
       border-radius: 5px;
+      padding: 0 0 0 10px;
 
       &__number {
-        width: 215px;
-        height: 36px;
-        padding-right: 5px;
+        width: 210px;
+        height: 30px;
         border-radius: 5px 0 0 5px;
       }
     }
@@ -198,29 +211,57 @@ export default {
       height: 30px;
       width: 250px;
       border-radius: 5px;
+      padding: 0 0 0 5px;
+      background-color: #ffffff;
     }
 
     &--checkbox {
-      width: 20px;
+      padding-right: 225px;
       height: 20px;
+      width: 20px;
+      margin-top: 3px;
+
+      .regular-checkbox {
+        -webkit-appearance: none;
+        background-color: #ffffff;
+        padding: 0;
+        border-radius: 4px;
+        position: relative;
+      }
+
+      .regular-checkbox:checked {
+        background-color: $highlight-color;
+      }
+
+      .regular-checkbox:checked:after {
+        content: '\2714';
+        font-size: 18px;
+        position: absolute;
+        top: -1px;
+        left: 2px;
+        color: #ffffff;
+      }
     }
 
     label {
       width: 25%;
+      height: 30px;
+      padding-top: 4px;
     }
 
     &__edit {
       display: flex;
       flex-direction: column;
 
-      button:hover {
+      :hover {
         background-color: $highlight-color;
       }
       &__button {
-        height: 18px;
-        width: 30px;
+        height: 15px;
+        width: 28px;
         padding: 0;
         border: 0;
+        font-size: 12px;
         background-color: #ffffff;
 
         &--increment {
@@ -234,12 +275,15 @@ export default {
   }
   &__submit {
     margin: 0 0 15px 0;
+    :hover {
+      background-color: $highlight-color;
+    }
 
     &__button {
       min-width: 350px;
       min-height: 40px;
       border-radius: 5px;
-}
+    }
   }
 }
 </style>
