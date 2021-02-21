@@ -10,12 +10,18 @@
           @input="getSuggestions()"
           class="form__input--textbox"
           placeholder="Nicol Bolas, Dragon-God"
+          autocomplete="off"
         />
       </div>
       <div class="form__input">
         <label>Edition</label>
         <select v-model="selected_edition" id="edition" class="form__input--dropdown">
-          <option v-for="edition in all_editions" v-bind:value="edition.key" :key="edition.id">
+          <option
+            v-for="edition in all_editions"
+            v-bind:value="edition.key"
+            :key="edition.id"
+            :selected="edition.name === selected_edition"
+          >
             {{ edition.name }}
           </option>
         </select>
@@ -153,6 +159,11 @@ export default {
       },
     }),
   },
+  watch: {
+    selected_edition: function () {
+      console.log(this.selected_edition);
+    },
+  },
   beforeMount() {
     this.getAllEditions();
     this.getAllCollections();
@@ -177,7 +188,6 @@ export default {
   &__input {
     height: 50px;
     margin-bottom: 10px;
-    margin-top: 5px;
     width: 100%;
     display: flex;
     align-items: flex-start;
@@ -189,6 +199,7 @@ export default {
     :focus {
       outline: 0;
       box-shadow: 0 0 3pt 2pt $highlight-color;
+      z-index: 10;
       border: 0;
     }
 

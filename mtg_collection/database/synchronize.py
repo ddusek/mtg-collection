@@ -4,8 +4,6 @@ import requests
 from redis import Redis
 from mtg_collection import constants
 
-ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-
 
 class Synchronizer():
     """Init or synchronize Redis database from json file.
@@ -19,8 +17,12 @@ class Synchronizer():
     def _json_to_dict(self) -> None:
         """Get json file into python dict.
         """
-        with open(os.path.join(ROOT_DIR, constants.SCRYFALL_CARDS_JSON_PATH), 'r') as file:
-            self.cards = json.load(file)
+        print('hello')
+        try:
+            with open(os.path.join(constants.ROOT_DIR, constants.SCRYFALL_CARDS_JSON_PATH), 'r') as file:
+                self.cards = json.load(file)
+        except Exception as err:
+            print(err)
 
     def _filter_card_fields(self, card: dict) -> dict:
         """Create card key and get only wanted card fields as value.
@@ -30,8 +32,9 @@ class Synchronizer():
         :return: New card object to be saved in database.
         :rtype: dict
         """
-        key = f'card:{card["set_name"].lower().replace(":", ";")}: \
-        {card["name"].lower().replace(":", ";")}'
+        card_edition = card["set_name"].lower().replace(":", ";")
+        card_name = card["name"].lower().replace(":", ";")
+        key = f'card:{card_edition}:{card_name}'
         values = {
             'name': card['name'],
             'set': card['set_name'],

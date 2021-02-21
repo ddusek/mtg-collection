@@ -3,6 +3,7 @@ import api from '../../api/cards';
 const state = () => ({
     cardName: '',
     editionName: '',
+    editionKey: '',
     foil: false,
     units: 1,
     collectionName: '',
@@ -16,6 +17,10 @@ const getters = {};
 const actions = {
     updateName({ commit }, payload) {
         commit('setName', payload);
+    },
+    updateCard({ commit }, payload) {
+        commit('setName', payload.name);
+        commit('setEdition', payload.edition);
     },
     updateEdition({ commit }, payload) {
         commit('setEdition', payload);

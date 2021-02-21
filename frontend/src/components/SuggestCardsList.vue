@@ -4,7 +4,7 @@
       class="suggestions__card"
       v-for="card in suggestedCards"
       :key="card.key"
-      @click="updateName(card.key)"
+      @click="updateCard(card)"
     >
       <label
         class="suggestions__card--name"
@@ -14,7 +14,9 @@
       >
         {{ card.name }}
       </label>
-      <label class="suggestions__card--edition">{{ card.edition }}</label>
+      <label class="suggestions__card--edition">
+        {{ card.edition }}
+      </label>
     </button>
   </div>
 </template>
@@ -30,8 +32,8 @@ export default {
   },
   methods: {
     ...mapActions({
-      updateName(dispatch, value) {
-        dispatch('card/updateName', value);
+      updateCard(dispatch, value) {
+        dispatch('card/updateCard', value);
       },
     }),
   },
@@ -42,33 +44,37 @@ export default {
 @import '../styles/_variables';
 .suggestions {
   display: flex;
-  flex-direction: column;
-  width: 700px;
+  flex-flow: column wrap;
+  height: 500px;
 
   button {
-    background-color: $card-button-color;
+    background-color: $background-color-medium;
+    height: 50px;
   }
 
   button:hover {
-    background-color: $card-button-hover;
+    background-color: $highlight-color-dark;
     cursor: pointer;
   }
 
   button:focus {
-    background-color: rgb(25, 125, 25);
+    background-color: $highlight-color;
+    outline: 0;
   }
 
   &__card {
+    min-width: 300px;
     display: flex;
     flex-direction: column;
-    width: 100%;
-    padding: 5px;
     font-size: 20px;
+    border: 0;
     :hover {
       cursor: pointer;
     }
     &--name {
-      color: rgb(225, 225, 225);
+      color: $primary-text-color;
+      font-weight: 1000;
+      overflow: visible;
     }
 
     &--highlighted {
@@ -76,7 +82,8 @@ export default {
     }
 
     &--edition {
-      color: rgb(155, 155, 0);
+      color: $primary-text-color;
+      font-size: 16px;
     }
   }
 }

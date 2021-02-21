@@ -3,16 +3,16 @@
     <div>
       <CardForm />
     </div>
-    <CardsList />
+    <SuggestCardsList />
   </div>
 </template>
 
 <script>
 import CardForm from './CardForm';
-import CardsList from './CardsList';
+import SuggestCardsList from './SuggestCardsList';
 
 export default {
-  components: { CardForm, CardsList },
+  components: { CardForm, SuggestCardsList },
 };
 </script>
 

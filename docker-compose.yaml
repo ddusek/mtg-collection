@@ -29,6 +29,7 @@ services:
       - ./mtg_collection/api:/mtg_collection/api
       - ./mtg_collection/database:/mtg_collection/database
       - ./mtg_collection/data:/mtg_collection/data
+      - ./mtg_collection/constants.py:/mtg_collection/constants.py
     env_file:
       - dev.env
     depends_on:
