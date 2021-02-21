@@ -170,11 +170,9 @@ export default {
   width: 450px;
 }
 .form {
-  background-color: $background-color-medium;
   width: 100%;
   box-sizing: border-box;
   padding: 0 30px;
-  overflow: auto;
 
   &__input {
     height: 50px;

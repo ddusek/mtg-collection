@@ -7,12 +7,12 @@
         <input
           id="collectionName"
           v-model="name"
-          class="form__input--textbox"
+          class="form__input form__input--textbox"
           placeholder="Cool deck"
         />
       </div>
-      <div class="form__submit">
-        <input type="submit" class="form__submit__button" value="Add" />
+      <div class="form__input form__input__submit">
+        <input type="submit" class="form__input__submit__button" value="Add" />
       </div>
     </form>
     <div v-if="showMsg" class="highlight--success">
@@ -65,66 +65,72 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import '../styles/_variables';
+
 .container {
+  background-color: $background-color-medium;
   display: flex;
-  align-items: center;
   flex-direction: column;
-  width: 500px;
-  height: 220px;
-  background-color: rgb(55, 55, 55);
-  font-size: 22px;
-  margin-right: 100px;
+  width: 450px;
+}
+.form {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0 30px;
 
-  h2 {
-    background-color: rgb(25, 25, 25);
+  &__input {
+    height: 50px;
+    margin-bottom: 10px;
+    margin-top: 5px;
     width: 100%;
-    text-align: center;
-    margin: 0 0 20px 0;
-    padding: 12px 0 5px 0;
-  }
-
-  .form {
-    width: 90%;
     display: flex;
     justify-content: center;
-    align-items: center;
-    flex-direction: column;
-
-    &__input {
-      height: 50px;
-      margin: 0 0 10px 0;
-      width: 100%;
-      display: flex;
-      align-items: flex-start;
-
-      &--textbox {
-        height: 25px;
-        width: 250px;
-      }
-
-      label {
-        width: 25%;
-        padding-right: 25px;
-      }
+    input {
+      margin: 0;
+      border: 0;
     }
+    :focus {
+      outline: 0;
+      box-shadow: 0 0 3pt 2pt $highlight-color;
+      border: 0;
+    }
+
+    &--textbox {
+      height: 30px;
+      width: 240px;
+      border-radius: 5px;
+      padding: 0 0 0 10px;
+    }
+
+    label {
+      width: 25%;
+      height: 30px;
+      padding-top: 4px;
+    }
+
     &__submit {
       margin: 0 0 15px 0;
+      align-items: flex-start;
+      :hover {
+        background-color: $highlight-color;
+      }
 
       &__button {
         min-width: 350px;
         min-height: 40px;
+        border-radius: 5px;
       }
     }
   }
-  .highlight {
-    width: 300;
-    height: 100px;
-    &--success {
-      background-color: green;
-    }
-    &--failed {
-      background-color: red;
-    }
+}
+.highlight {
+  width: 300px;
+  height: 100px;
+  &--success {
+    background-color: green;
+  }
+  &--failed {
+    background-color: red;
   }
 }
 </style>
