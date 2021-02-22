@@ -1,7 +1,6 @@
 import json
 import os
 import requests
-from redis import Redis
 from mtg_collection import constants
 
 
@@ -37,7 +36,7 @@ class Synchronizer():
         key = f'card:{card_edition}:{card_name}'
         values = {
             'name': card['name'],
-            'set': card['set_name'],
+            'edition': card['set_name'],
             'price': card['prices']['usd'],
             'price_foil': card['prices']['usd_foil'],
             'release': card['released_at'],

@@ -4,8 +4,8 @@ from flask_cors import CORS, cross_origin
 from redis import Redis
 from mtg_collection import constants
 from mtg_collection.database import redis_helper
-from mtg_collection.database import download
-from mtg_collection.database import synchronize
+from mtg_collection.database.download import Downloader
+from mtg_collection.database.synchronize import Synchronizer
 
 app = Flask(__name__)
 cors = CORS(app)
@@ -24,7 +24,8 @@ def suggest(text: str) -> object:
     :rtype: object
     """
     data = redis_helper.get_suggestions(REDIS, text, 20)
-    return jsonify(redis_helper.format_cards(data))
+    result = redis_helper.format_cards(data)
+    return jsonify(result)
 
 
 @app.route('/editions')
@@ -36,8 +37,9 @@ def editions() -> object:
     :rtype: object
     """
     data = redis_helper.get_all_editions(REDIS)
-    data_decoded = [byte.decode('utf-8') for byte in data]
-    return jsonify(redis_helper.format_dropdown(data_decoded))
+    data_decoded = [byte.decode('utf-8').removeprefix('edition:') for byte in data]
+    result = redis_helper.format_dropdown(data_decoded)
+    return jsonify(result)
 
 
 @app.route('/collections')
@@ -50,7 +52,8 @@ def collections() -> object:
     """
     data = redis_helper.get_all_collections(REDIS)
     data_decoded = [byte.decode('utf-8') for byte in data]
-    return jsonify(redis_helper.format_set_dropdown(data_decoded))
+    result = redis_helper.format_set_dropdown(data_decoded)
+    return jsonify(result)
 
 
 @app.route('/collection/<name>')
@@ -66,12 +69,12 @@ def collection(name: str) -> object:
     data = redis_helper.get_collection(REDIS, name)
     data_decoded = [json.loads(byte.decode('utf-8')) for byte in data]
 
-    indexed = []
+    result = []
     # Add index, so there is a better value to set as key in Vue loops.
     for i, item in enumerate(data_decoded):
         item['id'] = i
-        indexed.append(item)
-    return jsonify(indexed)
+        result.append(item)
+    return jsonify(result)
 
 
 @app.route('/add/<collection>/<card>/<units>', methods=['POST'])
@@ -88,7 +91,8 @@ def add_card(collection: str, card: str, units: int) -> object:
     :return: {"success": bool}.
     :rtype: object
     """
-    return jsonify(redis_helper.add_card_to_redis(REDIS, collection, card, units))
+    result = redis_helper.add_card_to_redis(REDIS, collection, card, units)
+    return jsonify(result)
 
 
 @app.route('/remove/<collection>/<card>/<units>')
@@ -118,7 +122,8 @@ def add_collection(collection: str) -> object:
     :return: {"success": bool}.
     :rtype: object
     """
-    return jsonify(redis_helper.add_collection_to_redis(REDIS, collection))
+    result = redis_helper.add_collection_to_redis(REDIS, collection)
+    return jsonify(result)
 
 
 @app.route('/download/scryfall/cards')
@@ -129,7 +134,7 @@ def download_scryfall_cards() -> object:
     :return: {"success": bool}.
     :rtype: object
     """
-    result = download.Downloader().download_scryfall_cards()
+    result = Downloader().download_scryfall_cards()
     return jsonify({'success': result})
 
 
@@ -141,5 +146,5 @@ def synchronize_scryfall_cards() -> object:
     :return: {"success": bool}.
     :rtype: object
     """
-    result = synchronize.Synchronizer(REDIS).synchronize_database()
+    result = Synchronizer(REDIS).synchronize_database()
     return jsonify({'success': result})

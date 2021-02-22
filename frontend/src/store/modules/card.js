@@ -6,9 +6,7 @@ const state = () => ({
     editionKey: '',
     foil: false,
     units: 1,
-    collectionName: '',
     allEditions: [],
-    allCollections: [],
     addedSuccess: false,
 });
 
@@ -31,16 +29,9 @@ const actions = {
     updateUnits({ commit }, payload) {
         commit('setUnits', payload);
     },
-    updateCollection({ commit }, payload) {
-        commit('setCollection', payload);
-    },
     async getAllEditions({ commit }) {
         let data = await api.getAllEditions();
         commit('setAllEditions', data);
-    },
-    async getAllCollections({ commit }) {
-        let data = await api.getAllCollections();
-        commit('setAllCollections', data);
     },
     async addCard({ commit }, payload) {
         let data = await api.addCard(payload.collection, payload.card, payload.units);
@@ -61,14 +52,8 @@ const mutations = {
     setUnits(state, payload) {
         state.units = payload;
     },
-    setCollection(state, payload) {
-        state.collectionName = payload;
-    },
     setAllEditions(state, payload) {
         state.allEditions = payload;
-    },
-    setAllCollections(state, payload) {
-        state.allCollections = payload;
     },
     setAddedSuccess(state, payload) {
         state.addedSuccess = payload;

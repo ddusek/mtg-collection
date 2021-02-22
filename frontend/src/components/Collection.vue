@@ -30,7 +30,7 @@
         <tbody>
           <tr v-for="card in collectionCards" :key="card.id">
             <td>{{ card.name }}</td>
-            <td>{{ card.set }}</td>
+            <td>{{ card.edition }}</td>
             <td>{{ card.price }}</td>
             <td>{{ card.price_foil }}</td>
             <td>{{ card.release }}</td>
@@ -48,15 +48,15 @@ export default {
   computed: {
     collections: {
       get() {
-        return this.$store.state.card.allCollections;
+        return this.$store.state.collection.allCollections;
       },
     },
     selected_collection: {
       get() {
-        return this.$store.state.card.collectionName;
+        return this.$store.state.collection.collectionName;
       },
       set(value) {
-        this.$store.dispatch('card/updateCollection', value);
+        this.$store.dispatch('collection/updateCollection', value);
       },
     },
     collectionCards: {
@@ -76,10 +76,15 @@ export default {
   methods: {
     ...mapActions({
       getCollectionCards(dispatch) {
-        console.log(this.selected_collection);
         dispatch('collection/getCollectionCards', this.selected_collection);
       },
+      getAllCollections(dispatch) {
+        dispatch('collection/getAllCollections');
+      },
     }),
+  },
+  beforeMount() {
+    this.getAllCollections();
   },
 };
 </script>

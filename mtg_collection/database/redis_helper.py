@@ -142,6 +142,9 @@ def add_card_to_redis(redis: 'Redis', collection: str, card: str, units: int) ->
     """
     key = f'collection:{collection}:{card}:{units}'
     value = redis.get(card)
+    print(key)
+    print(value)
+    print(card)
     return {'success': redis.set(key, value) if value else False}
 
 
@@ -179,17 +182,15 @@ def format_cards(cards_data: list[str]) -> list[str]:
 def format_dropdown(keys: list[str]) -> list[dict]:
     """Format keys from Redis objects to dropdown menu.
 
-    :param keys: Redis keys, where key[1] will be used as dict value for name.
+    :param keys: Redis keys, where key[0] will be used as dict value for name.
     :type keys: list[str]
     :return: List of items ready for dropdown menu.
     :rtype: list[dict]
     """
     editions = []
     for i, data in enumerate(keys):
-        data_list = data.split(':')
-        if len(data_list) > 1:
-            edition = ({'id': i, 'key': data, 'name': data_list[1]})
-            editions.append(edition)
+        edition = {'id': i, 'key': data, 'name': data}
+        editions.append(edition)
     return sorted(editions, key=lambda k: k['name'])
 
 

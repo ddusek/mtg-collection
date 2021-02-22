@@ -49,6 +49,7 @@
         />
         <div class="form__input__edit">
           <button
+            type="button"
             class="form__input__edit__button form__input__edit__button--increment"
             v-on:click="units++"
             :disabled="units >= 999"
@@ -56,6 +57,7 @@
             ▲
           </button>
           <button
+            type="button"
             class="form__input__edit__button form__input__edit__button--decrement"
             v-on:click="units--"
             :disabled="units <= 1"
@@ -103,7 +105,7 @@ export default {
     },
     all_collections: {
       get() {
-        return this.$store.state.card.allCollections;
+        return this.$store.state.collection.allCollections;
       },
     },
     selected_edition: {
@@ -132,10 +134,10 @@ export default {
     },
     selected_collection: {
       get() {
-        return this.$store.state.card.collectionName;
+        return this.$store.state.collection.collectionName;
       },
       set(value) {
-        this.$store.dispatch('card/updateCollection', value);
+        this.$store.dispatch('collection/updateCollection', value);
       },
     },
   },
@@ -148,7 +150,7 @@ export default {
         dispatch('card/getAllEditions');
       },
       getAllCollections(dispatch) {
-        dispatch('card/getAllCollections');
+        dispatch('collection/getAllCollections');
       },
       addCard(dispatch) {
         dispatch('card/addCard', {
@@ -158,11 +160,6 @@ export default {
         });
       },
     }),
-  },
-  watch: {
-    selected_edition: function () {
-      console.log(this.selected_edition);
-    },
   },
   beforeMount() {
     this.getAllEditions();
