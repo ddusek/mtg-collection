@@ -1,4 +1,7 @@
-def _order_by_name_key(text: str, cards: str) -> list[str]:
+from mtg_collection.database import logger
+
+
+def _order_by_name_key(text: str, cards: list[bytes]) -> list[str]:
     """Order cards by full match, card containing text and not edition, then rest.
 
     :param text: Text to find in all keys.
@@ -10,9 +13,12 @@ def _order_by_name_key(text: str, cards: str) -> list[str]:
     """
     prioritized = []
     rest = []
-    for card in cards:
-        card = card.decode('utf-8')
-        name = card.split(':')[2]
+    for card_bytes in cards:
+        card = card_bytes.decode('utf-8')
+        card_fields = card.split(':')
+        if len(card_fields) < 3:
+            raise IndexError('card key format is invalid', card_bytes)
+        name = card_fields[2]
         if text in name:
             prioritized.append(card)
         else:
@@ -68,12 +74,20 @@ def get_suggestions(redis: 'Redis', text: str, limit: int = 0) -> list[str]:
     :return: List of keys.
     :rtype: list[str]
     """
+    if text is None:
+        logger.warning('suggest text should not be empty')
     text = text.lower()
     matches = _get_matches(redis, f'card:*{text}*')
     if len(matches) >= limit > 0:
-        matches = _order_by_name_key(text, matches)
-        return matches[:limit]
-    return _order_by_name_key(text, matches)
+        try:
+            matches = _order_by_name_key(text, matches)
+            return matches[:limit]
+        except IndexError as err:
+            logger.exception(err)
+    try:
+        return _order_by_name_key(text, matches)
+    except IndexError as err:
+        logger.exception(err)
 
 
 def get_set_keys(redis: 'Redis', set_name: str) -> list[str]:
@@ -121,7 +135,6 @@ def get_collection(redis: 'Redis', name: str) -> list[str]:
     :return: List of keys.
     :rtype: list[str]
     """
-    print(name)
     keys = _get_matches(redis, f'collection:{name}:*')
     return redis.mget(keys)
 
@@ -140,11 +153,16 @@ def add_card_to_redis(redis: 'Redis', collection: str, card: str, units: int) ->
     :return: {"success": bool}
     :rtype: object
     """
+    if collection is None:
+        raise ValueError('cannot add card, collection part is None')
+    if card is None:
+        raise ValueError('cannot add card, card part is None')
+    if units is None:
+        raise ValueError('cannot add card, units part is None')
     key = f'collection:{collection}:{card}:{units}'
     value = redis.get(card)
-    print(key)
-    print(value)
-    print(card)
+    if value is None:
+        raise ValueError('cannot add card, its value was not found by card key', card)
     return {'success': redis.set(key, value) if value else False}
 
 
@@ -174,6 +192,8 @@ def format_cards(cards_data: list[str]) -> list[str]:
     cards = []
     for i, data in enumerate(cards_data):
         data_list = data.split(':')
+        if len(data_list) < 3:
+            raise IndexError("card is in wrong format", cards_data)
         card = ({'id': i, 'key': data, 'name': data_list[2], 'edition': data_list[1]})
         cards.append(card)
     return cards

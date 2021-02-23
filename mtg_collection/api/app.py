@@ -3,6 +3,7 @@ from flask import Flask, jsonify
 from flask_cors import CORS, cross_origin
 from redis import Redis
 from mtg_collection import constants
+from mtg_collection.api import logger
 from mtg_collection.database import redis_helper
 from mtg_collection.database.download import Downloader
 from mtg_collection.database.synchronize import Synchronizer
@@ -23,9 +24,16 @@ def suggest(text: str) -> object:
     :return: List of cards.
     :rtype: object
     """
-    data = redis_helper.get_suggestions(REDIS, text, 20)
-    result = redis_helper.format_cards(data)
-    return jsonify(result)
+    try:
+        data = redis_helper.get_suggestions(REDIS, text, 20)
+        result = redis_helper.format_cards(data)
+        return jsonify(result)
+    except (ConnectionError, TimeoutError) as err:
+        logger.exception(err)
+    except IndexError as err:
+        logger.exception(err)
+    except TypeError as err:
+        logger.exception(err)
 
 
 @app.route('/editions')
@@ -36,10 +44,15 @@ def editions() -> object:
     :return: List of all editions.
     :rtype: object
     """
-    data = redis_helper.get_all_editions(REDIS)
-    data_decoded = [byte.decode('utf-8').removeprefix('edition:') for byte in data]
-    result = redis_helper.format_dropdown(data_decoded)
-    return jsonify(result)
+    try:
+        data = redis_helper.get_all_editions(REDIS)
+        data_decoded = [byte.decode('utf-8').removeprefix('edition:') for byte in data]
+        result = redis_helper.format_dropdown(data_decoded)
+        if result is None:
+            logger.warning('\'/editions\' returned 0 values')
+        return jsonify(result)
+    except (ConnectionError, TimeoutError) as err:
+        logger.exception('cannot connect to Redis. %s', err)
 
 
 @app.route('/collections')
@@ -50,10 +63,13 @@ def collections() -> object:
     :return: List of collections.
     :rtype: object
     """
-    data = redis_helper.get_all_collections(REDIS)
-    data_decoded = [byte.decode('utf-8') for byte in data]
-    result = redis_helper.format_set_dropdown(data_decoded)
-    return jsonify(result)
+    try:
+        data = redis_helper.get_all_collections(REDIS)
+        data_decoded = [byte.decode('utf-8') for byte in data]
+        result = redis_helper.format_set_dropdown(data_decoded)
+        return jsonify(result)
+    except (ConnectionError, TimeoutError) as err:
+        logger.exception('cannot connect to Redis. %s', err)
 
 
 @app.route('/collection/<name>')
@@ -66,15 +82,18 @@ def collection(name: str) -> object:
     :return: List of card objects.
     :rtype: object
     """
-    data = redis_helper.get_collection(REDIS, name)
-    data_decoded = [json.loads(byte.decode('utf-8')) for byte in data]
+    try:
+        data = redis_helper.get_collection(REDIS, name)
+        data_decoded = [json.loads(byte.decode('utf-8')) for byte in data]
 
-    result = []
-    # Add index, so there is a better value to set as key in Vue loops.
-    for i, item in enumerate(data_decoded):
-        item['id'] = i
-        result.append(item)
-    return jsonify(result)
+        result = []
+        # Add index, so there is a better value to set as key in Vue loops.
+        for i, item in enumerate(data_decoded):
+            item['id'] = i
+            result.append(item)
+        return jsonify(result)
+    except (ConnectionError, TimeoutError) as err:
+        logger.exception('cannot connect to Redis. %s', err)
 
 
 @app.route('/add/<collection>/<card>/<units>', methods=['POST'])
@@ -91,8 +110,13 @@ def add_card(collection: str, card: str, units: int) -> object:
     :return: {"success": bool}.
     :rtype: object
     """
-    result = redis_helper.add_card_to_redis(REDIS, collection, card, units)
-    return jsonify(result)
+    try:
+        result = redis_helper.add_card_to_redis(REDIS, collection, card, units)
+        return jsonify(result)
+    except ValueError as err:
+        logger.exception(err)
+    except (ConnectionError, TimeoutError) as err:
+        logger.exception('cannot connect to Redis. %s', err)
 
 
 @app.route('/remove/<collection>/<card>/<units>')
@@ -122,8 +146,11 @@ def add_collection(collection: str) -> object:
     :return: {"success": bool}.
     :rtype: object
     """
-    result = redis_helper.add_collection_to_redis(REDIS, collection)
-    return jsonify(result)
+    try:
+        result = redis_helper.add_collection_to_redis(REDIS, collection)
+        return jsonify(result)
+    except (ConnectionError, TimeoutError) as err:
+        logger.exception('cannot connect to Redis. %s', err)
 
 
 @app.route('/download/scryfall/cards')

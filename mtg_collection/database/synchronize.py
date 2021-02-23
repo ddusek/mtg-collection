@@ -2,6 +2,7 @@ import json
 import os
 import requests
 from mtg_collection import constants
+from mtg_collection.database import logger
 
 
 class Synchronizer():
@@ -20,8 +21,11 @@ class Synchronizer():
         try:
             with open(os.path.join(constants.ROOT_DIR, constants.SCRYFALL_CARDS_JSON_PATH), 'r') as file:
                 self.cards = json.load(file)
-        except Exception as err:
-            print(err)
+        except OSError as err:
+            logger.exception('cannot read json file with cards. %s. rootpath: %s, json_path: %s',
+                             err, constants.ROOT_DIR, constants.SCRYFALL_CARDS_JSON_PATH)
+        except TypeError as err:
+            logger.exception(err)
 
     def _filter_card_fields(self, card: dict) -> dict:
         """Create card key and get only wanted card fields as value.
@@ -97,14 +101,9 @@ class Synchronizer():
         :param pattern: pattern to match keys from.
         :type pattern: str
         """
-        matched_keys = []
-        cur = '0'
-        while cur != 0:
-            cur, keys = self.redis.scan(cur, pattern, 10000)
-            matched_keys += keys
-        if len(matched_keys) > 0:
-            for key in matched_keys:
-                self.redis.delete(key)
+        matched_keys = self.redis.scan_iter(pattern, 10000)
+        for key in matched_keys:
+            self.redis.delete(key)
 
     def synchronize_database(self) -> bool:
         """Synchronize cards and editions in database with a file.
@@ -118,5 +117,5 @@ class Synchronizer():
             self._init_cards()
             self._init_editions()
             return True
-        except Exception:
-            return False
+        except (ConnectionError, TimeoutError) as err:
+            logger.exception(err)
