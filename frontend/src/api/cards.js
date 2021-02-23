@@ -50,9 +50,9 @@ const getCollectionCards = async (name) => {
         });
 };
 
-const addCard = async (collection, card, units) => {
+const addCard = async (collection, card, edition, units) => {
     return axios
-        .post(`${APIURL}/add/${collection}/${card}/${units}`)
+        .post(`${APIURL}/add/${collection}/${card}/${edition}/${units}`)
         .then((response) => {
             return response.status.success;
         })

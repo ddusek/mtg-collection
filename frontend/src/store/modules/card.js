@@ -3,7 +3,6 @@ import api from '../../api/cards';
 const state = () => ({
     cardName: '',
     editionName: '',
-    editionKey: '',
     foil: false,
     units: 1,
     allEditions: [],
@@ -34,7 +33,12 @@ const actions = {
         commit('setAllEditions', data);
     },
     async addCard({ commit }, payload) {
-        let data = await api.addCard(payload.collection, payload.card, payload.units);
+        let data = await api.addCard(
+            payload.collection,
+            payload.card,
+            payload.edition,
+            payload.units
+        );
         commit('setAddedSuccess', data);
     },
 };

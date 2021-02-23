@@ -139,7 +139,7 @@ def get_collection(redis: 'Redis', name: str) -> list[str]:
     return redis.mget(keys)
 
 
-def add_card_to_redis(redis: 'Redis', collection: str, card: str, units: int) -> object:
+def add_card_to_redis(redis: 'Redis', collection: str, card: str, edition: str, units: int) -> object:
     """Add card and to a collection.
 
     :param redis: Redis instance.
@@ -148,6 +148,8 @@ def add_card_to_redis(redis: 'Redis', collection: str, card: str, units: int) ->
     :type collection: str
     :param card: Card to add.
     :type card: str
+    :param edition: Edition of card to add.
+    :type edition: str
     :param units: Number of units to add.
     :type units: int
     :return: {"success": bool}
@@ -160,9 +162,9 @@ def add_card_to_redis(redis: 'Redis', collection: str, card: str, units: int) ->
     if units is None:
         raise ValueError('cannot add card, units part is None')
     key = f'collection:{collection}:{card}:{units}'
-    value = redis.get(card)
+    value = redis.get(f'card:{edition}:{card}')
     if value is None:
-        raise ValueError('cannot add card, its value was not found by card key', card)
+        raise ValueError('cannot add card, its value was not found by card key', card, f'card:{edition}:{card}')
     return {'success': redis.set(key, value) if value else False}
 
 

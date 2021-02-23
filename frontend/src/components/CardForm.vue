@@ -16,12 +16,7 @@
       <div class="form__input">
         <label>Edition</label>
         <select v-model="selected_edition" id="edition" class="form__input--dropdown">
-          <option
-            v-for="edition in all_editions"
-            v-bind:value="edition.key"
-            :key="edition.id"
-            :selected="edition.name === selected_edition"
-          >
+          <option v-for="edition in all_editions" v-bind:value="edition.key" :key="edition.id">
             {{ edition.name }}
           </option>
         </select>
@@ -156,6 +151,7 @@ export default {
         dispatch('card/addCard', {
           collection: this.selected_collection,
           card: this.name,
+          edition: this.selected_edition,
           units: this.units,
         });
       },

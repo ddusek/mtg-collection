@@ -96,22 +96,24 @@ def collection(name: str) -> object:
         logger.exception('cannot connect to Redis. %s', err)
 
 
-@app.route('/add/<collection>/<card>/<units>', methods=['POST'])
+@app.route('/add/<collection>/<card>/<edition>/<units>', methods=['POST'])
 @cross_origin()
-def add_card(collection: str, card: str, units: int) -> object:
+def add_card(collection: str, card: str, edition: str, units: int) -> object:
     """Add card to collection.
 
     :param collection: Collection key in Redis, where card should be saved.
     :type collection: str
-    :param card: Card key in Redis.
+    :param card: Card part of key in Redis.
     :type card: str
+    :param edition: Edition part key of card key in Redis.
+    :type edition: str
     :param units: Number of units to save.
     :type units: int
     :return: {"success": bool}.
     :rtype: object
     """
     try:
-        result = redis_helper.add_card_to_redis(REDIS, collection, card, units)
+        result = redis_helper.add_card_to_redis(REDIS, collection, card, edition, units)
         return jsonify(result)
     except ValueError as err:
         logger.exception(err)
