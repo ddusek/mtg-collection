@@ -16,13 +16,26 @@ services:
       - ./mtg_collection/database:/app/database
       - ./mtg_collection/data:/data
 
-  flask:
-    container_name: mtg-flask
+  mongo:
+    image: mongo:latest
+    container_name: mtg-mongo
+    restart: always
+    environment:
+      MONGO_INITDB_DATABASE: mtg-collection
+      MONGO_INITDB_ROOT_USERNAME: mtg-admin
+      MONGO_INITDB_ROOT_PASSWORD: 123456
+    ports:
+      - 27017:27017
+    networks:
+      - mtg
+
+  starlette:
+    container_name: mtg-starlette
     build:
       context: ./
-      dockerfile: Flask.Dockerfile
+      dockerfile: Starlette.Dockerfile
     ports:
-      - 5000:5000
+      - 8000:8000
     networks:
       - mtg
     volumes:
@@ -34,6 +47,7 @@ services:
       - dev.env
     depends_on:
       - redis
+      - mongo
 
   frontend:
     container_name: mtg-frontend

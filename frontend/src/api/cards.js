@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const APIURL = 'http://localhost:5000';
+const APIURL = 'http://0.0.0.0:8000/api';
 
 const getCardSuggestions = async (input) => {
     return axios

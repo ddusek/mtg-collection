@@ -13,16 +13,16 @@ COPY mtg_collection/database /mtg_collection/database
 COPY mtg_collection/constants.py /mtg_collection/constants.py
 COPY mtg_collection/__init__.py /mtg_collection/__init__.py
 COPY requirements.txt /requirements.txt
-COPY scripts/flask-entrypoint.sh /mtg_collection/flask-entrypoint.sh
+COPY scripts/starlette-entrypoint.sh /mtg_collection/starlette-entrypoint.sh
 
-ENV PYTHONPATH=./:$PYTHONPATH
+ENV PYTHONPATH=./
 
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir --requirement /requirements.txt
 
-RUN chmod 774 /mtg_collection/flask-entrypoint.sh
+RUN chmod 774 /mtg_collection/starlette-entrypoint.sh
 RUN chmod 774 /mtg_collection -R
 
-EXPOSE 5000
+EXPOSE 8000
 
-ENTRYPOINT [ "/mtg_collection/flask-entrypoint.sh" ]
+ENTRYPOINT [ "/mtg_collection/starlette-entrypoint.sh" ]
