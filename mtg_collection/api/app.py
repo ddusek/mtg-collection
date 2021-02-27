@@ -11,8 +11,28 @@ from mtg_collection.api import logger
 from mtg_collection.database import redis_helper
 from mtg_collection.database.download import Downloader
 from mtg_collection.database.synchronize import Synchronizer
+from mtg_collection.database.authentication import Authenticator
 
 
+async def register(request) -> JSONResponse:
+    """Register a new user and save him into a session.
+
+    :return: {"success": bool}.
+    :rtype: JSONResponse
+    """
+    print(request)
+    auth = Authenticator(MONGO)
+    # success = auth.register_user()
+    # return JSONResponse({'success': success[0], 'message': success[1]})
+
+
+async def login(request) -> JSONResponse:
+    """Login user and save him into a session.
+
+    :return: {"success": bool}.
+    :rtype: JSONResponse
+    """
+    pass
 
 
 async def suggest(request) -> JSONResponse:
@@ -21,7 +41,7 @@ async def suggest(request) -> JSONResponse:
     :param text: Text which cards need to contain.
     :type text: str
     :return: List of cards.
-    :rtype: object
+    :rtype: JSONResponse
     """
     text = request.path_params['text']
     try:
@@ -40,7 +60,7 @@ async def editions(request) -> JSONResponse:
     """Return all editions.
 
     :return: List of all editions.
-    :rtype: object
+    :rtype: JSONResponse
     """
     try:
         data = redis_helper.get_all_editions(REDIS)
@@ -57,7 +77,7 @@ async def collections(request) -> JSONResponse:
     """Return all collections.
 
     :return: List of collections.
-    :rtype: object
+    :rtype: JSONResponse
     """
     try:
         data = redis_helper.get_all_collections(REDIS)
@@ -74,7 +94,7 @@ async def collection(request) -> JSONResponse:
     :param name: Collection key in Redis.
     :type name: str
     :return: List of card objects.
-    :rtype: object
+    :rtype: JSONResponse
     """
     name = request.path_params['name']
     try:
@@ -103,7 +123,7 @@ async def add_card(request) -> JSONResponse:
     :param units: Number of units to save.
     :type units: int
     :return: {"success": bool}.
-    :rtype: object
+    :rtype: JSONResponse
     """
     collection = request.path_params['collection']
     card = request.path_params['card']
@@ -130,7 +150,7 @@ async def remove_card(request) -> JSONResponse:
     :param units: Number of units to remove.
     :type units: int
     :return: {"success": bool}.
-    :rtype: object
+    :rtype: JSONResponse
     """
     # collection = request.path_params['collection']
     # card = request.path_params['card']
@@ -145,7 +165,7 @@ async def add_collection(request) -> JSONResponse:
     :param collection: Collection key to add to Redis.
     :type collection: str
     :return: {"success": bool}.
-    :rtype: object
+    :rtype: JSONResponse
     """
     collection = request.path_params['collection']
     try:
@@ -159,7 +179,7 @@ async def download_scryfall_cards(request) -> JSONResponse:
     """Download cards bulk data from Scryfall.
 
     :return: {"success": bool}.
-    :rtype: object
+    :rtype: JSONResponse
     """
     result = Downloader().download_scryfall_cards()
     return JSONResponse({'success': result})
@@ -169,7 +189,7 @@ async def synchronize_scryfall_cards(request) -> JSONResponse:
     """Synchronize cards from Scryfall to redis.
 
     :return: {"success": bool}.
-    :rtype: object
+    :rtype: JSONResponse
     """
     result = Synchronizer(REDIS).synchronize_database()
     return JSONResponse({'success': result})
@@ -178,6 +198,8 @@ async def synchronize_scryfall_cards(request) -> JSONResponse:
 middleware = [Middleware(CORSMiddleware, allow_origins=['*'])]
 routes = [
     Mount('/api', routes=[
+        Route('/register', register),
+        Route('/login', login),
         Route('/suggest/{text:str}', suggest),
         Route('/editions', editions),
         Route('/collections', collections),

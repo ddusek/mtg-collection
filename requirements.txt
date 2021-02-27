@@ -7,3 +7,4 @@ redis
 starlette
 uvicorn
 pymongo
+argon2-cffi
