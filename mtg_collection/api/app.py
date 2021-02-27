@@ -13,6 +13,8 @@ from mtg_collection.database.download import Downloader
 from mtg_collection.database.synchronize import Synchronizer
 
 
+
+
 async def suggest(request) -> JSONResponse:
     """Return auto suggested cards.
 
@@ -173,7 +175,7 @@ async def synchronize_scryfall_cards(request) -> JSONResponse:
     return JSONResponse({'success': result})
 
 
-middleware = [Middleware(CORSMiddleware, allow_origins=['*'])]  # TODO only trusted host.
+middleware = [Middleware(CORSMiddleware, allow_origins=['*'])]
 routes = [
     Mount('/api', routes=[
         Route('/suggest/{text:str}', suggest),
@@ -182,11 +184,11 @@ routes = [
         Route('/collection/{name:str}', collection),
         Route('/add/{collection:str}/{card:str}/{edition:str}/{units:int}', add_card, methods=['POST']),
         Route('/remove/{collection:str}/{card:str}/{edition:str}/{units:int}', remove_card),
-        Route('/add/<collection>', add_collection, methods=['POST']),
+        Route('/add/{collection}', add_collection, methods=['POST']),
         Route('/download/scryfall/cards', download_scryfall_cards),
         Route('/synchronize/scryfall/cards', synchronize_scryfall_cards),
     ])
 ]
 app = Starlette(debug=True, middleware=middleware, routes=routes)
 REDIS = Redis(host=constants.REDIS_HOSTNAME, port=constants.REDIS_PORT, db=constants.REDIS_MAIN_DB)
-MONGO = MongoClient(constants.MONGO_HOST)
+MONGO = MongoClient(constants.MONGO_HOST)['mtg-collection']

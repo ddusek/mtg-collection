@@ -2,6 +2,7 @@ import os
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 LOGGING_FILE = f'{ROOT_DIR}/data/logs.log'
+
 # Scryfall data.
 SCRYFALL_BULK_URL = 'https://api.scryfall.com/bulk-data'
 SCRYFALL_EDITIONS_URL = 'https://api.scryfall.com/sets'

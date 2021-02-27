@@ -21,14 +21,17 @@ services:
     container_name: mtg-mongo
     restart: always
     environment:
-      MONGO_INITDB_DATABASE: mtg-collection
       MONGO_INITDB_ROOT_USERNAME: mtg-admin
       MONGO_INITDB_ROOT_PASSWORD: 123456
+      MONGO_INITDB_DATABASE: mtg-collection
     ports:
       - 27017:27017
     networks:
       - mtg
-
+    volumes:
+      - ./scripts/mongo-entrypoint.js:/docker-entrypoint-initdb.d/mongo-entrypoint.js:ro
+    depends_on: 
+      - redis
   starlette:
     container_name: mtg-starlette
     build:
