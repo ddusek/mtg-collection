@@ -52,11 +52,11 @@ class Authenticator:
         """
         exists = self._mongo_db.users.count_documents(
             {'$or':
-                [{'username': username}, {'email': email}]},
-            {'limit': 1})
+                [{'username': username}, {'email': email}]})
         if any(exists):
             return (False, 'Username or email already registered.')
         try:
+            
             hashed_pwd = self._pwd_hasher.hash(password)
             self._mongo_db.users.insert_one(
                 {'username': username,

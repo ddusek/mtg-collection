@@ -1,4 +1,5 @@
 import json
+import urllib.parse
 from redis import Redis
 from pymongo import MongoClient
 from starlette.applications import Starlette
@@ -20,10 +21,10 @@ async def register(request) -> JSONResponse:
     :return: {"success": bool}.
     :rtype: JSONResponse
     """
-    print(request)
+    params = await request.json()
     auth = Authenticator(MONGO)
-    # success = auth.register_user()
-    # return JSONResponse({'success': success[0], 'message': success[1]})
+    success = auth.register_user(params['username'], params['password'], params['email'])
+    return JSONResponse({'success': success[0], 'message': success[1]})
 
 
 async def login(request) -> JSONResponse:
@@ -195,11 +196,11 @@ async def synchronize_scryfall_cards(request) -> JSONResponse:
     return JSONResponse({'success': result})
 
 
-middleware = [Middleware(CORSMiddleware, allow_origins=['*'])]
+middleware = [Middleware(CORSMiddleware, allow_origins=['*'], allow_methods=['GET', 'POST'])]
 routes = [
     Mount('/api', routes=[
-        Route('/register', register),
-        Route('/login', login),
+        Route('/register', register, methods=['POST', 'OPTIONS']),
+        Route('/login', login, methods=['POST']),
         Route('/suggest/{text:str}', suggest),
         Route('/editions', editions),
         Route('/collections', collections),
@@ -213,4 +214,8 @@ routes = [
 ]
 app = Starlette(debug=True, middleware=middleware, routes=routes)
 REDIS = Redis(host=constants.REDIS_HOSTNAME, port=constants.REDIS_PORT, db=constants.REDIS_MAIN_DB)
-MONGO = MongoClient(constants.MONGO_HOST)['mtg-collection']
+MONGO = MongoClient('mongodb://%s:%s@%s' % (
+                    urllib.parse.quote_plus(constants.MONGO_USERNAME),
+                    urllib.parse.quote_plus(constants.MONGO_PASSWORD),
+                    constants.MONGO_HOSTNAME),
+                    serverSelectionTimeoutMS=3000)['mtg-collection']
