@@ -2,6 +2,42 @@ import axios from 'axios';
 
 const APIURL = 'http://0.0.0.0:8000/api';
 
+const register = async (data) => {
+    return axios
+        .post(`${APIURL}/register`, data)
+        .then((response) => {
+            return response.status == 200;
+        })
+        .catch((error) => {
+            console.log(error);
+            return null;
+        });
+};
+
+const login = async (data) => {
+    return axios
+        .post(`${APIURL}/login`, data)
+        .then((response) => {
+            return response.status == 200;
+        })
+        .catch((error) => {
+            console.log(error);
+            return null;
+        });
+};
+
+const logout = async () => {
+    return axios
+        .post(`${APIURL}/logout`)
+        .then((response) => {
+            return response.status == 200;
+        })
+        .catch((error) => {
+            console.log(error);
+            return null;
+        });
+};
+
 const getCardSuggestions = async (input) => {
     return axios
         .get(`${APIURL}/suggest/${input}`)
@@ -99,6 +135,9 @@ const syncDatabaseFromFile = async () => {
 };
 
 export default {
+    register,
+    login,
+    logout,
     getCardSuggestions,
     getAllEditions,
     getAllCollections,

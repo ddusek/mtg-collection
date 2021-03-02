@@ -1,4 +1,4 @@
-import api from '../../api/cards';
+import api from '../../api/api';
 
 const state = () => ({
     cardName: '',

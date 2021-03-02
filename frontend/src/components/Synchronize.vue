@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import api from '../api/cards';
+import api from '../api/api';
 
 export default {
   data() {

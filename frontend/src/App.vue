@@ -8,6 +8,7 @@
         <li><router-link to="/collections">Collections</router-link></li>
         <li><router-link to="/add-collection">Add collection</router-link></li>
         <li><router-link to="/add-card">Add card</router-link></li>
+        <li><router-link to="/authentication">Login/Register</router-link></li>
       </ul>
     </header>
     <div id="main">
@@ -17,9 +18,7 @@
 </template>
 
 <script>
-export default {
-  components: {},
-};
+export default {};
 </script>
 
 <style lang="scss">

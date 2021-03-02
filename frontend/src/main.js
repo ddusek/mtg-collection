@@ -2,15 +2,15 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 import App from './App.vue';
 import store from './store';
-import './styles/main.scss';
 import Home from './components/PageHome';
 import Collections from './components/PageCollections';
 import AddCollection from './components/PageAddCollection';
 import AddCard from './components/PageAddCard';
+import Authentication from './components/PageAuthentication';
+import './styles/main.scss';
 
 Vue.use(VueRouter);
 
-// 3. Create the router
 const router = new VueRouter({
     mode: 'history',
     base: __dirname,
@@ -19,6 +19,7 @@ const router = new VueRouter({
         { path: '/collections', component: Collections },
         { path: '/add-collection', component: AddCollection },
         { path: '/add-card', component: AddCard },
+        { path: '/authentication', component: Authentication },
     ],
 });
 

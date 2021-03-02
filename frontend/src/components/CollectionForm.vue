@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <h2>Add new collection</h2>
-    <form class="form" action="post" v-on:submit.prevent="addCollection">
+    <form class="form" method="post" v-on:submit.prevent="addCollection">
       <div class="form__input">
         <label>Name</label>
         <input
