@@ -1,5 +1,5 @@
 [flake8]
-max-line-length = 120
+max-line-length = 90
 per-file-ignores =
     mtg_collection/database/redis_helper.py:F821,
     mtg_collection/database/authentication.py:F821

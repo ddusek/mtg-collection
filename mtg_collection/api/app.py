@@ -17,6 +17,7 @@ from mtg_collection.database.synchronize import Synchronizer
 from mtg_collection.database.authentication import Authenticator
 
 
+# pylint: disable=unused-argument
 async def register(request) -> JSONResponse:
     """Register a new user and save him into a session.
 
@@ -26,12 +27,14 @@ async def register(request) -> JSONResponse:
     params = await request.json()
     auth = Authenticator(MONGO)
     try:
-        user = auth.register_user(params['username'], params['password'], params['email'])
+        user = auth.register_user(
+            params["username"], params["password"], params["email"]
+        )
         if user[0]:
-            response = JSONResponse({'success': True})
-            response.set_cookie('logged_user', user[1])
+            response = JSONResponse({"success": True})
+            response.set_cookie("logged_user", user[1])
             return response
-        return JSONResponse({'success': False})
+        return JSONResponse({"success": False})
     except ValueError as err:
         logger.exception(err)
 
@@ -53,7 +56,7 @@ async def suggest(request) -> JSONResponse:
     :return: List of cards.
     :rtype: JSONResponse
     """
-    text = request.path_params['text']
+    text = request.path_params["text"]
     try:
         data = redis_helper.get_suggestions(REDIS, text, 20)
         result = redis_helper.format_cards(data)
@@ -74,13 +77,13 @@ async def editions(request) -> JSONResponse:
     """
     try:
         data = redis_helper.get_all_editions(REDIS)
-        data_decoded = [byte.decode('utf-8').removeprefix('edition:') for byte in data]
+        data_decoded = [byte.decode("utf-8").removeprefix("edition:") for byte in data]
         result = redis_helper.format_dropdown(data_decoded)
         if result is None:
-            logger.warning('\'/editions\' returned 0 values')
+            logger.warning("'/editions' returned 0 values")
         return JSONResponse(result)
     except (ConnectionError, TimeoutError) as err:
-        logger.exception('cannot connect to Redis. %s', err)
+        logger.exception("cannot connect to Redis. %s", err)
 
 
 async def collections(request) -> JSONResponse:
@@ -91,11 +94,11 @@ async def collections(request) -> JSONResponse:
     """
     try:
         data = redis_helper.get_all_collections(REDIS)
-        data_decoded = [byte.decode('utf-8') for byte in data]
+        data_decoded = [byte.decode("utf-8") for byte in data]
         result = redis_helper.format_set_dropdown(data_decoded)
         return JSONResponse(result)
     except (ConnectionError, TimeoutError) as err:
-        logger.exception('cannot connect to Redis. %s', err)
+        logger.exception("cannot connect to Redis. %s", err)
 
 
 async def collection(request) -> JSONResponse:
@@ -106,19 +109,19 @@ async def collection(request) -> JSONResponse:
     :return: List of card objects.
     :rtype: JSONResponse
     """
-    name = request.path_params['name']
+    name = request.path_params["name"]
     try:
         data = redis_helper.get_collection(REDIS, name)
-        data_decoded = [json.loads(byte.decode('utf-8')) for byte in data]
+        data_decoded = [json.loads(byte.decode("utf-8")) for byte in data]
 
         result = []
         # Add index, so there is a better value to set as key in Vue loops.
         for i, item in enumerate(data_decoded):
-            item['id'] = i
+            item["id"] = i
             result.append(item)
         return JSONResponse(result)
     except (ConnectionError, TimeoutError) as err:
-        logger.exception('cannot connect to Redis. %s', err)
+        logger.exception("cannot connect to Redis. %s", err)
 
 
 async def add_card(request) -> JSONResponse:
@@ -135,17 +138,17 @@ async def add_card(request) -> JSONResponse:
     :return: {"success": bool}.
     :rtype: JSONResponse
     """
-    collection = request.path_params['collection']
-    card = request.path_params['card']
-    edition = request.path_params['edition']
-    units = request.path_params['units']
+    collection = request.path_params["collection"]
+    card = request.path_params["card"]
+    edition = request.path_params["edition"]
+    units = request.path_params["units"]
     try:
         result = redis_helper.add_card_to_redis(REDIS, collection, card, edition, units)
         return JSONResponse(result)
     except ValueError as err:
         logger.exception(err)
     except (ConnectionError, TimeoutError) as err:
-        logger.exception('cannot connect to Redis. %s', err)
+        logger.exception("cannot connect to Redis. %s", err)
 
 
 async def remove_card(request) -> JSONResponse:
@@ -177,12 +180,12 @@ async def add_collection(request) -> JSONResponse:
     :return: {"success": bool}.
     :rtype: JSONResponse
     """
-    collection = request.path_params['collection']
+    collection = request.path_params["collection"]
     try:
         result = redis_helper.add_collection_to_redis(REDIS, collection)
         return JSONResponse(result)
     except (ConnectionError, TimeoutError) as err:
-        logger.exception('cannot connect to Redis. %s', err)
+        logger.exception("cannot connect to Redis. %s", err)
 
 
 async def download_scryfall_cards(request) -> JSONResponse:
@@ -192,7 +195,7 @@ async def download_scryfall_cards(request) -> JSONResponse:
     :rtype: JSONResponse
     """
     result = Downloader().download_scryfall_cards()
-    return JSONResponse({'success': result})
+    return JSONResponse({"success": result})
 
 
 async def synchronize_scryfall_cards(request) -> JSONResponse:
@@ -202,36 +205,60 @@ async def synchronize_scryfall_cards(request) -> JSONResponse:
     :rtype: JSONResponse
     """
     result = Synchronizer(REDIS).synchronize_database()
-    return JSONResponse({'success': result})
+    return JSONResponse({"success": result})
+
 
 # Create middlewares.
-middlewares = [Middleware(CORSMiddleware, allow_origins=['*'], allow_methods=['GET', 'POST']),
-              Middleware(SessionMiddleware, secret_key=key_generator(), max_age=365*24*60*60, https_only=False)]
+middlewares = [
+    Middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["GET", "POST"]),
+    Middleware(
+        SessionMiddleware,
+        secret_key=key_generator(),
+        max_age=365 * 24 * 60 * 60,
+        https_only=False,
+    ),
+]
 
 # Add routes.
 routes = [
-    Mount('/api', routes=[
-        Route('/register', register, methods=['POST', 'OPTIONS']),
-        Route('/login', login, methods=['POST']),
-        Route('/suggest/{text:str}', suggest),
-        Route('/editions', editions),
-        Route('/collections', collections),
-        Route('/collection/{name:str}', collection),
-        Route('/add/{collection:str}/{card:str}/{edition:str}/{units:int}', add_card, methods=['POST']),
-        Route('/remove/{collection:str}/{card:str}/{edition:str}/{units:int}', remove_card),
-        Route('/add/{collection}', add_collection, methods=['POST']),
-        Route('/download/scryfall/cards', download_scryfall_cards),
-        Route('/synchronize/scryfall/cards', synchronize_scryfall_cards),
-    ])
+    Mount(
+        "/api",
+        routes=[
+            Route("/register", register, methods=["POST", "OPTIONS"]),
+            Route("/login", login, methods=["POST"]),
+            Route("/suggest/{text:str}", suggest),
+            Route("/editions", editions),
+            Route("/collections", collections),
+            Route("/collection/{name:str}", collection),
+            Route(
+                "/add/{collection:str}/{card:str}/{edition:str}/{units:int}",
+                add_card,
+                methods=["POST"],
+            ),
+            Route(
+                "/remove/{collection:str}/{card:str}/{edition:str}/{units:int}",
+                remove_card,
+            ),
+            Route("/add/{collection}", add_collection, methods=["POST"]),
+            Route("/download/scryfall/cards", download_scryfall_cards),
+            Route("/synchronize/scryfall/cards", synchronize_scryfall_cards),
+        ],
+    )
 ]
 
 # Start api.
 app = Starlette(debug=True, middleware=middlewares, routes=routes)
 
 # Connect to databases.
-REDIS = Redis(host=constants.REDIS_HOSTNAME, port=constants.REDIS_PORT, db=constants.REDIS_MAIN_DB)
-MONGO = MongoClient('mongodb://%s:%s@%s' % (
-                    urllib.parse.quote_plus(constants.MONGO_USERNAME),
-                    urllib.parse.quote_plus(constants.MONGO_PASSWORD),
-                    constants.MONGO_HOSTNAME),
-                    serverSelectionTimeoutMS=3000)['mtg-collection']
+REDIS = Redis(
+    host=constants.REDIS_HOSTNAME, port=constants.REDIS_PORT, db=constants.REDIS_MAIN_DB
+)
+MONGO = MongoClient(
+    "mongodb://%s:%s@%s"
+    % (
+        urllib.parse.quote_plus(constants.MONGO_USERNAME),
+        urllib.parse.quote_plus(constants.MONGO_PASSWORD),
+        constants.MONGO_HOSTNAME,
+    ),
+    serverSelectionTimeoutMS=3000,
+)["mtg-collection"]

@@ -14,10 +14,10 @@ def _order_by_name_key(text: str, cards: list[bytes]) -> list[str]:
     prioritized = []
     rest = []
     for card_bytes in cards:
-        card = card_bytes.decode('utf-8')
-        card_fields = card.split(':')
+        card = card_bytes.decode("utf-8")
+        card_fields = card.split(":")
         if len(card_fields) < 3:
-            raise IndexError('card key format is invalid', card_bytes)
+            raise IndexError("card key format is invalid", card_bytes)
         name = card_fields[2]
         if text in name:
             prioritized.append(card)
@@ -38,10 +38,10 @@ def _full_match(name: str, cards: list) -> list[str]:
     :return: List of matched cards.
     :rtype: list[str]
     """
-    return [card for card in cards if card.split(':')[2] == name]
+    return [card for card in cards if card.split(":")[2] == name]
 
 
-def _get_matches(redis: 'Redis', text: str) -> list[str]:
+def _get_matches(redis: "Redis", text: str) -> list[str]:
     """Get keys from redis filtered by text.
 
     :param redis: Redis instance.
@@ -52,14 +52,14 @@ def _get_matches(redis: 'Redis', text: str) -> list[str]:
     :rtype: list[str]
     """
     matched_keys = []
-    cur = '0'
+    cur = "0"
     while cur != 0:
         cur, keys = redis.scan(cur, text, 10000)
         matched_keys += keys
     return matched_keys
 
 
-def get_suggestions(redis: 'Redis', text: str, limit: int = 0) -> list[str]:
+def get_suggestions(redis: "Redis", text: str, limit: int = 0) -> list[str]:
     """Scan all keys in database and return keys with given text.
 
 
@@ -75,9 +75,9 @@ def get_suggestions(redis: 'Redis', text: str, limit: int = 0) -> list[str]:
     :rtype: list[str]
     """
     if text is None:
-        logger.warning('suggest text should not be empty')
+        logger.warning("suggest text should not be empty")
     text = text.lower()
-    matches = _get_matches(redis, f'card:*{text}*')
+    matches = _get_matches(redis, f"card:*{text}*")
     if len(matches) >= limit > 0:
         try:
             matches = _order_by_name_key(text, matches)
@@ -90,7 +90,7 @@ def get_suggestions(redis: 'Redis', text: str, limit: int = 0) -> list[str]:
         logger.exception(err)
 
 
-def get_set_keys(redis: 'Redis', set_name: str) -> list[str]:
+def get_set_keys(redis: "Redis", set_name: str) -> list[str]:
     """Get all keys in given set.
 
     :param redis: Redis instance.
@@ -103,7 +103,7 @@ def get_set_keys(redis: 'Redis', set_name: str) -> list[str]:
     return redis.smembers(set_name)
 
 
-def get_all_editions(redis: 'Redis') -> list[str]:
+def get_all_editions(redis: "Redis") -> list[str]:
     """Get all editions from database.
 
     :param redis: Redis instance.
@@ -111,10 +111,10 @@ def get_all_editions(redis: 'Redis') -> list[str]:
     :return: List of keys.
     :rtype: list[str]
     """
-    return get_set_keys(redis, 'editions')
+    return get_set_keys(redis, "editions")
 
 
-def get_all_collections(redis: 'Redis') -> list[str]:
+def get_all_collections(redis: "Redis") -> list[str]:
     """Get all collections from database.
 
     :param redis: Redis instance.
@@ -122,10 +122,10 @@ def get_all_collections(redis: 'Redis') -> list[str]:
     :return: List of keys.
     :rtype: list[str]
     """
-    return get_set_keys(redis, 'collections')
+    return get_set_keys(redis, "collections")
 
 
-def get_collection(redis: 'Redis', name: str) -> list[str]:
+def get_collection(redis: "Redis", name: str) -> list[str]:
     """Get all cards from collection.
 
     :param redis: Redis instance.
@@ -135,11 +135,13 @@ def get_collection(redis: 'Redis', name: str) -> list[str]:
     :return: List of keys.
     :rtype: list[str]
     """
-    keys = _get_matches(redis, f'collection:{name}:*')
+    keys = _get_matches(redis, f"collection:{name}:*")
     return redis.mget(keys)
 
 
-def add_card_to_redis(redis: 'Redis', collection: str, card: str, edition: str, units: int) -> object:
+def add_card_to_redis(
+    redis: "Redis", collection: str, card: str, edition: str, units: int
+) -> object:
     """Add card and to a collection.
 
     :param redis: Redis instance.
@@ -156,19 +158,23 @@ def add_card_to_redis(redis: 'Redis', collection: str, card: str, edition: str, 
     :rtype: object
     """
     if collection is None:
-        raise ValueError('cannot add card, collection part is None')
+        raise ValueError("cannot add card, collection part is None")
     if card is None:
-        raise ValueError('cannot add card, card part is None')
+        raise ValueError("cannot add card, card part is None")
     if units is None:
-        raise ValueError('cannot add card, units part is None')
-    key = f'collection:{collection}:{card}:{units}'
-    value = redis.get(f'card:{edition}:{card}')
+        raise ValueError("cannot add card, units part is None")
+    key = f"collection:{collection}:{card}:{units}"
+    value = redis.get(f"card:{edition}:{card}")
     if value is None:
-        raise ValueError('cannot add card, its value was not found by card key', card, f'card:{edition}:{card}')
-    return {'success': redis.set(key, value) if value else False}
+        raise ValueError(
+            "cannot add card, its value was not found by card key",
+            card,
+            f"card:{edition}:{card}",
+        )
+    return {"success": redis.set(key, value) if value else False}
 
 
-def add_collection_to_redis(redis: 'Redis', collection: str) -> object:
+def add_collection_to_redis(redis: "Redis", collection: str) -> object:
     """Add new empty collection.
 
     If collection is already in set, it gets rewritten so basically nothing happens.
@@ -180,7 +186,7 @@ def add_collection_to_redis(redis: 'Redis', collection: str) -> object:
     :return: {"success": bool}.
     :rtype: object
     """
-    return {'success': redis.sadd('collections', collection)}
+    return {"success": redis.sadd("collections", collection)}
 
 
 def format_cards(cards_data: list[str]) -> list[str]:
@@ -193,10 +199,10 @@ def format_cards(cards_data: list[str]) -> list[str]:
     """
     cards = []
     for i, data in enumerate(cards_data):
-        data_list = data.split(':')
+        data_list = data.split(":")
         if len(data_list) < 3:
             raise IndexError("card is in wrong format", cards_data)
-        card = ({'id': i, 'key': data, 'name': data_list[2], 'edition': data_list[1]})
+        card = {"id": i, "key": data, "name": data_list[2], "edition": data_list[1]}
         cards.append(card)
     return cards
 
@@ -211,9 +217,9 @@ def format_dropdown(keys: list[str]) -> list[dict]:
     """
     editions = []
     for i, data in enumerate(keys):
-        edition = {'id': i, 'key': data, 'name': data}
+        edition = {"id": i, "key": data, "name": data}
         editions.append(edition)
-    return sorted(editions, key=lambda k: k['name'])
+    return sorted(editions, key=lambda k: k["name"])
 
 
 def format_set_dropdown(keys: list[str]) -> list[dict]:
@@ -226,6 +232,6 @@ def format_set_dropdown(keys: list[str]) -> list[dict]:
     """
     dropdown_data = []
     for i, data in enumerate(keys):
-        dictionary = ({'id': i, 'key': data, 'name': data})
+        dictionary = {"id": i, "key": data, "name": data}
         dropdown_data.append(dictionary)
-    return sorted(dropdown_data, key=lambda k: k['name'])
+    return sorted(dropdown_data, key=lambda k: k["name"])

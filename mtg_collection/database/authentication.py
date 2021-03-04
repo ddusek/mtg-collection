@@ -1,13 +1,18 @@
 from datetime import datetime
 from argon2 import PasswordHasher
-from argon2.exceptions import HashingError, VerificationError, VerifyMismatchError, InvalidHash
+from argon2.exceptions import (
+    HashingError,
+    VerificationError,
+    VerifyMismatchError,
+    InvalidHash,
+)
 from pymongo.database import Database  # TODO remove this
 from mtg_collection.database import logger
 
 
 class Authenticator:
-    """Class for registration and login of users.
-    """
+    """Class for registration and login of users."""
+
     def __init__(self, mongo_db: Database):
         self._mongo_db = mongo_db
         self._pwd_hasher = PasswordHasher()
@@ -20,7 +25,7 @@ class Authenticator:
         :return: true if email, false if username.
         :rtype: bool
         """
-        return '@' in login
+        return "@" in login
 
     def _rehash_password(self, user, password: str):
         """hash password again if Argon2 parameters change.
@@ -33,8 +38,8 @@ class Authenticator:
         try:
             new_hashed_pwd = self._pwd_hasher.hash(password)
             self._mongo_db.users.update_one(
-                {'username': user.username},
-                {'$set': {'password': new_hashed_pwd}})
+                {"username": user.username}, {"$set": {"password": new_hashed_pwd}}
+            )
         except HashingError as err:
             logger.exception(err)
 
@@ -51,25 +56,28 @@ class Authenticator:
         :rtype: (bool, str)
         """
         if not username:
-            raise ValueError('cannot register user, didnt get username')
+            raise ValueError("cannot register user, didnt get username")
         if not password:
-            raise ValueError('cannot register user, didnt get password')
+            raise ValueError("cannot register user, didnt get password")
         if not email:
-            raise ValueError('cannot register user, didnt get email')
+            raise ValueError("cannot register user, didnt get email")
 
         exists = self._mongo_db.users.count_documents(
-            {'$or': [{'username': username}, {'email': email}]}, limit=1)
+            {"$or": [{"username": username}, {"email": email}]}, limit=1
+        )
         if exists > 0:
-            return (False, 'Username or email already registered.')
+            return (False, "Username or email already registered.")
         try:
-            
+
             _id = self._mongo_db.users.insert_one(
-                {'username': username,
-                 'password': self._pwd_hasher.hash(password),
-                 'email': email,
-                 'created': datetime.now(),
-                 'last_login': datetime.now()
-                 })
+                {
+                    "username": username,
+                    "password": self._pwd_hasher.hash(password),
+                    "email": email,
+                    "created": datetime.now(),
+                    "last_login": datetime.now(),
+                }
+            )
             return (True, _id)
         except HashingError as err:
             logger.exception(err)
@@ -84,17 +92,19 @@ class Authenticator:
         :return: {success: bool, user: userID, error: str}.
         :rtype: dict
         """
-        user = self._mongo_db.users.find_one({'email': login}) \
-            if self._is_email(login) else \
-            self._mongo_db.users.find_one({'username': login})
+        user = (
+            self._mongo_db.users.find_one({"email": login})
+            if self._is_email(login)
+            else self._mongo_db.users.find_one({"username": login})
+        )
 
         try:
             if self._pwd_hasher.verify(user.password, password):
                 # If user was verified, rehash password if it's needed.
                 if self._pwd_hasher.check_needs_rehash(user.password):
                     self._rehash_password(user, password)
-                return {'success': True, 'user': user._id, 'error': ''}
-            return {'success': False, 'user': 0, 'error': 'Failed to verify password.'}
+                return {"success": True, "user": user._id, "error": ""}
+            return {"success": False, "user": 0, "error": "Failed to verify password."}
 
         except (VerificationError, VerifyMismatchError) as err:
             logger.info(err)
