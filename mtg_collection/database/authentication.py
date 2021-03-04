@@ -50,22 +50,27 @@ class Authenticator:
         :return: bool with message about failed/success login.
         :rtype: (bool, str)
         """
+        if not username:
+            raise ValueError('cannot register user, didnt get username')
+        if not password:
+            raise ValueError('cannot register user, didnt get password')
+        if not email:
+            raise ValueError('cannot register user, didnt get email')
+
         exists = self._mongo_db.users.count_documents(
-            {'$or':
-                [{'username': username}, {'email': email}]})
-        if any(exists):
+            {'$or': [{'username': username}, {'email': email}]}, limit=1)
+        if exists > 0:
             return (False, 'Username or email already registered.')
         try:
             
-            hashed_pwd = self._pwd_hasher.hash(password)
-            self._mongo_db.users.insert_one(
+            _id = self._mongo_db.users.insert_one(
                 {'username': username,
-                 'password': hashed_pwd,
+                 'password': self._pwd_hasher.hash(password),
                  'email': email,
                  'created': datetime.now(),
                  'last_login': datetime.now()
                  })
-            return (True, 'success')
+            return (True, _id)
         except HashingError as err:
             logger.exception(err)
 

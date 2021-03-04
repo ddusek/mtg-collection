@@ -7,8 +7,10 @@ from starlette.routing import Route, Mount
 from starlette.responses import JSONResponse
 from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
+from starlette.middleware.sessions import SessionMiddleware
 from mtg_collection import constants
 from mtg_collection.api import logger
+from mtg_collection.api.helpers import key_generator
 from mtg_collection.database import redis_helper
 from mtg_collection.database.download import Downloader
 from mtg_collection.database.synchronize import Synchronizer
@@ -23,8 +25,15 @@ async def register(request) -> JSONResponse:
     """
     params = await request.json()
     auth = Authenticator(MONGO)
-    success = auth.register_user(params['username'], params['password'], params['email'])
-    return JSONResponse({'success': success[0], 'message': success[1]})
+    try:
+        user = auth.register_user(params['username'], params['password'], params['email'])
+        if user[0]:
+            response = JSONResponse({'success': True})
+            response.set_cookie('logged_user', user[1])
+            return response
+        return JSONResponse({'success': False})
+    except ValueError as err:
+        logger.exception(err)
 
 
 async def login(request) -> JSONResponse:
@@ -195,8 +204,11 @@ async def synchronize_scryfall_cards(request) -> JSONResponse:
     result = Synchronizer(REDIS).synchronize_database()
     return JSONResponse({'success': result})
 
+# Create middlewares.
+middlewares = [Middleware(CORSMiddleware, allow_origins=['*'], allow_methods=['GET', 'POST']),
+              Middleware(SessionMiddleware, secret_key=key_generator(), max_age=365*24*60*60, https_only=False)]
 
-middleware = [Middleware(CORSMiddleware, allow_origins=['*'], allow_methods=['GET', 'POST'])]
+# Add routes.
 routes = [
     Mount('/api', routes=[
         Route('/register', register, methods=['POST', 'OPTIONS']),
@@ -212,7 +224,11 @@ routes = [
         Route('/synchronize/scryfall/cards', synchronize_scryfall_cards),
     ])
 ]
-app = Starlette(debug=True, middleware=middleware, routes=routes)
+
+# Start api.
+app = Starlette(debug=True, middleware=middlewares, routes=routes)
+
+# Connect to databases.
 REDIS = Redis(host=constants.REDIS_HOSTNAME, port=constants.REDIS_PORT, db=constants.REDIS_MAIN_DB)
 MONGO = MongoClient('mongodb://%s:%s@%s' % (
                     urllib.parse.quote_plus(constants.MONGO_USERNAME),

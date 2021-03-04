@@ -1,10 +1,12 @@
 requests
 flake8
 pylint
+black
 tqdm
 rope
 redis
 starlette
+itsdangerous
 uvicorn
 pymongo
 argon2-cffi
