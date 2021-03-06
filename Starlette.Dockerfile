@@ -14,6 +14,8 @@ COPY mtg_collection/constants.py /mtg_collection/constants.py
 COPY mtg_collection/__init__.py /mtg_collection/__init__.py
 COPY requirements.txt /requirements.txt
 COPY scripts/starlette-entrypoint.sh /mtg_collection/starlette-entrypoint.sh
+COPY certs/localhost+2.pem /localhost+2.pem
+COPY certs/localhost+2-key.pem /localhost+2-key.pem
 
 ENV PYTHONPATH=./
 
