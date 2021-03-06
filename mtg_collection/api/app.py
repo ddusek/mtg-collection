@@ -5,12 +5,12 @@ from pymongo import MongoClient
 from starlette.applications import Starlette
 from starlette.routing import Route, Mount
 from starlette.responses import JSONResponse
+from starlette.requests import Request
 from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 from mtg_collection import constants
 from mtg_collection.api import logger
-from mtg_collection.api.helpers import key_generator
 from mtg_collection.database import redis_helper
 from mtg_collection.database.download import Downloader
 from mtg_collection.database.synchronize import Synchronizer
@@ -18,7 +18,7 @@ from mtg_collection.database.authentication import Authenticator
 
 
 # pylint: disable=unused-argument
-async def register(request) -> JSONResponse:
+async def register(request: Request) -> JSONResponse:
     """Register a new user and save him into a session.
 
     :return: {"success": bool}.
@@ -31,15 +31,18 @@ async def register(request) -> JSONResponse:
             params["username"], params["password"], params["email"]
         )
         if user[0]:
-            response = JSONResponse({"success": True})
-            response.set_cookie("logged_user", user[1])
-            return response
+            try:
+                response = JSONResponse({"success": True})
+                response.set_cookie('user', str(user[1]))
+                return response
+            except Exception as err:
+                print(err)
         return JSONResponse({"success": False})
     except ValueError as err:
         logger.exception(err)
 
 
-async def login(request) -> JSONResponse:
+async def login(request: Request) -> JSONResponse:
     """Login user and save him into a session.
 
     :return: {"success": bool}.
@@ -48,7 +51,7 @@ async def login(request) -> JSONResponse:
     pass
 
 
-async def suggest(request) -> JSONResponse:
+async def suggest(request: Request) -> JSONResponse:
     """Return auto suggested cards.
 
     :param text: Text which cards need to contain.
@@ -69,7 +72,7 @@ async def suggest(request) -> JSONResponse:
         logger.exception(err)
 
 
-async def editions(request) -> JSONResponse:
+async def editions(request: Request) -> JSONResponse:
     """Return all editions.
 
     :return: List of all editions.
@@ -86,7 +89,7 @@ async def editions(request) -> JSONResponse:
         logger.exception("cannot connect to Redis. %s", err)
 
 
-async def collections(request) -> JSONResponse:
+async def collections(request: Request) -> JSONResponse:
     """Return all collections.
 
     :return: List of collections.
@@ -101,7 +104,7 @@ async def collections(request) -> JSONResponse:
         logger.exception("cannot connect to Redis. %s", err)
 
 
-async def collection(request) -> JSONResponse:
+async def collection(request: Request) -> JSONResponse:
     """Return all cards from collection by its name.
 
     :param name: Collection key in Redis.
@@ -124,7 +127,7 @@ async def collection(request) -> JSONResponse:
         logger.exception("cannot connect to Redis. %s", err)
 
 
-async def add_card(request) -> JSONResponse:
+async def add_card(request: Request) -> JSONResponse:
     """Add card to collection.
 
     :param collection: Collection key in Redis, where card should be saved.
@@ -151,7 +154,7 @@ async def add_card(request) -> JSONResponse:
         logger.exception("cannot connect to Redis. %s", err)
 
 
-async def remove_card(request) -> JSONResponse:
+async def remove_card(request: Request) -> JSONResponse:
     """Remove card from collection.
 
     param collection: Collection key in Redis, from where to remove card.
@@ -172,7 +175,7 @@ async def remove_card(request) -> JSONResponse:
     return
 
 
-async def add_collection(request) -> JSONResponse:
+async def add_collection(request: Request) -> JSONResponse:
     """Add new collection.
 
     :param collection: Collection key to add to Redis.
@@ -188,7 +191,7 @@ async def add_collection(request) -> JSONResponse:
         logger.exception("cannot connect to Redis. %s", err)
 
 
-async def download_scryfall_cards(request) -> JSONResponse:
+async def download_scryfall_cards(request: Request) -> JSONResponse:
     """Download cards bulk data from Scryfall.
 
     :return: {"success": bool}.
@@ -198,7 +201,7 @@ async def download_scryfall_cards(request) -> JSONResponse:
     return JSONResponse({"success": result})
 
 
-async def synchronize_scryfall_cards(request) -> JSONResponse:
+async def synchronize_scryfall_cards(request: Request) -> JSONResponse:
     """Synchronize cards from Scryfall to redis.
 
     :return: {"success": bool}.
@@ -210,12 +213,23 @@ async def synchronize_scryfall_cards(request) -> JSONResponse:
 
 # Create middlewares.
 middlewares = [
-    Middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["GET", "POST"]),
+    Middleware(
+        CORSMiddleware,
+        allow_origins=[
+            "https://0.0.0.0:8080",
+            "https://localhost:8080",
+            "https://127.0.0.1:8080",
+        ],
+        allow_credentials=True,
+        allow_headers=["Content-Type", "Authorization"],
+        allow_methods=["GET", "POST", "OPTIONS"],
+    ),
     Middleware(
         SessionMiddleware,
-        secret_key=key_generator(),
-        max_age=365 * 24 * 60 * 60,
-        https_only=False,
+        secret_key="megasecret",
+        same_site="none",
+        max_age=365 * 24 * 60 * 60,  # 1 year
+        https_only=True,
     ),
 ]
 
@@ -224,7 +238,7 @@ routes = [
     Mount(
         "/api",
         routes=[
-            Route("/register", register, methods=["POST", "OPTIONS"]),
+            Route("/register", register, methods=["POST"]),
             Route("/login", login, methods=["POST"]),
             Route("/suggest/{text:str}", suggest),
             Route("/editions", editions),

@@ -1,3 +1,5 @@
+from os import urandom
+from base64 import b64encode
 from datetime import datetime
 from argon2 import PasswordHasher
 from argon2.exceptions import (
@@ -52,7 +54,7 @@ class Authenticator:
         :type password: str
         :param email: Email of user.
         :type email: str
-        :return: bool with message about failed/success login.
+        :return: bool about failed/success login + user token if success.
         :rtype: (bool, str)
         """
         if not username:
@@ -68,17 +70,19 @@ class Authenticator:
         if exists > 0:
             return (False, "Username or email already registered.")
         try:
-
-            _id = self._mongo_db.users.insert_one(
+            token = b64encode(urandom(128)).decode('utf-8')
+            print(token)
+            self._mongo_db.users.insert_one(
                 {
                     "username": username,
                     "password": self._pwd_hasher.hash(password),
                     "email": email,
                     "created": datetime.now(),
                     "last_login": datetime.now(),
+                    "token": token,
                 }
             )
-            return (True, _id)
+            return (True, token)
         except HashingError as err:
             logger.exception(err)
 

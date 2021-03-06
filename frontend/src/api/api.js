@@ -1,10 +1,13 @@
 import axios from 'axios';
 
-const APIURL = 'http://0.0.0.0:8000/api';
+const APIURL = 'https://0.0.0.0:8000/api';
+axios.defaults.withCredentials = true;
+axios.defaults.xsrfCookieName = 'csrftoken';
+axios.defaults.xsrfHeaderName = 'X-CSRFTOKEN';
 
 const register = async (data) => {
     return axios
-        .post(`${APIURL}/register`, data)
+        .post(`${APIURL}/register`, data, { credentials: 'include' })
         .then((response) => {
             return response.status == 200;
         })
