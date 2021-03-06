@@ -3,14 +3,26 @@
     <div class="container">
       <h2>Already logged in</h2>
       <div class="form__input form__submit">
-        <input type="submit" class="form__submit__button" value="Log out" />
+        <button v-on:click="logout" type="submit" class="form__submit__button">Log out</button>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-export default {};
+import { mapActions } from 'vuex';
+export default {
+  data() {
+    return {};
+  },
+  methods: {
+    ...mapActions({
+      logout(dispatch) {
+        dispatch('auth/logout');
+      },
+    }),
+  },
+};
 </script>
 
 <style lang="scss" scoped>

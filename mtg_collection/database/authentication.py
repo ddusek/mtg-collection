@@ -8,6 +8,7 @@ from argon2.exceptions import (
     VerifyMismatchError,
     InvalidHash,
 )
+from bson.objectid import ObjectId
 from pymongo.database import Database  # TODO remove this
 from mtg_collection.database import logger
 
@@ -45,7 +46,7 @@ class Authenticator:
         except HashingError as err:
             logger.exception(err)
 
-    def register_user(self, username: str, password: str, email: str) -> (bool, str):
+    def register_user(self, username: str, password: str, email: str) -> dict:
         """Register a new user.
 
         :param username: Username of user.
@@ -54,7 +55,7 @@ class Authenticator:
         :type password: str
         :param email: Email of user.
         :type email: str
-        :return: bool about failed/success login + user token if success.
+        :return: bool about failed/success login, user token and userID if success.
         :rtype: (bool, str)
         """
         if not username:
@@ -70,19 +71,19 @@ class Authenticator:
         if exists > 0:
             return (False, "Username or email already registered.")
         try:
-            token = b64encode(urandom(128)).decode('utf-8')
-            print(token)
-            self._mongo_db.users.insert_one(
+            token = b64encode(urandom(128)).decode("utf-8")
+
+            _id = self._mongo_db.users.insert_one(
                 {
                     "username": username,
                     "password": self._pwd_hasher.hash(password),
                     "email": email,
                     "created": datetime.now(),
                     "last_login": datetime.now(),
-                    "token": token,
+                    "tokens": [token],
                 }
-            )
-            return (True, token)
+            ).inserted_id
+            return {"success": True, "token": token, "id": _id}
         except HashingError as err:
             logger.exception(err)
 
@@ -114,3 +115,19 @@ class Authenticator:
             logger.info(err)
         except InvalidHash as err:
             logger.exception(err)
+
+    def logout_user(self, token: str, user_id: str) -> dict:
+        """Logout user with deleting his login token from the database.
+
+        :param token: Username or email of user.
+        :type token: str
+        :return: {success: bool, user: userID, error: str}.
+        :rtype: dict
+        """
+        print(token, ObjectId(user_id))
+        user = self._mongo_db.users.update_one(
+            {"_id": ObjectId(user_id)}, {"$pull": {"tokens": token}}
+        )
+        if user.modified_count < 1:
+            return {"success": False, "message": "User or token not found."}
+        return {"success": True, "message": "token removed from database"}

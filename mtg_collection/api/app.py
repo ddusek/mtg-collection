@@ -27,16 +27,14 @@ async def register(request: Request) -> JSONResponse:
     params = await request.json()
     auth = Authenticator(MONGO)
     try:
-        user = auth.register_user(
+        user_info = auth.register_user(
             params["username"], params["password"], params["email"]
         )
-        if user[0]:
-            try:
-                response = JSONResponse({"success": True})
-                response.set_cookie('user', str(user[1]))
-                return response
-            except Exception as err:
-                print(err)
+        if user_info["success"]:
+            response = JSONResponse({"success": True})
+            response.set_cookie("user_token", str(user_info["token"]))
+            response.set_cookie("user_id", str(user_info["id"]))
+            return response
         return JSONResponse({"success": False})
     except ValueError as err:
         logger.exception(err)
@@ -49,6 +47,28 @@ async def login(request: Request) -> JSONResponse:
     :rtype: JSONResponse
     """
     pass
+
+
+async def logout(request: Request) -> JSONResponse:
+    """Logout user by removing his user cookies and his login token from database.
+
+    :return: {"success": bool}.
+    :rtype: JSONResponse
+    """
+    token = request.cookies.get("user_token")
+    user_id = request.cookies.get("user_id")
+    if not token or not user_id:
+        return JSONResponse({"success": False, "message": "no user is logged in"})
+
+    auth = Authenticator(MONGO)
+    logout_info = auth.logout_user(token, user_id)
+    if logout_info["success"]:
+        response = JSONResponse(logout_info)
+        response.delete_cookie("user_token")
+        response.delete_cookie("user_id")
+        return response
+
+    return JSONResponse(response)
 
 
 async def suggest(request: Request) -> JSONResponse:
@@ -233,13 +253,14 @@ middlewares = [
     ),
 ]
 
-# Add routes.
+# Create routes.
 routes = [
     Mount(
         "/api",
         routes=[
             Route("/register", register, methods=["POST"]),
             Route("/login", login, methods=["POST"]),
+            Route("/logout", logout, methods=["POST"]),
             Route("/suggest/{text:str}", suggest),
             Route("/editions", editions),
             Route("/collections", collections),
