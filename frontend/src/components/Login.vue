@@ -2,13 +2,14 @@
   <div>
     <div class="container">
       <h2>Login</h2>
-      <form method="post" v-on:submit.prevent="login">
+      <form method="post" v-on:submit.prevent="loginUser">
         <div class="form__input">
           <input
             id="login-login"
             class="form__input--textbox"
             type="text"
             placeholder="username or email"
+            v-model="login"
           />
         </div>
         <div class="form__input">
@@ -17,6 +18,7 @@
             class="form__input--textbox"
             type="password"
             placeholder="Password"
+            v-model="password"
           />
         </div>
         <div class="form__input form__submit">
@@ -28,7 +30,25 @@
 </template>
 
 <script>
-export default {};
+import { mapActions } from 'vuex';
+export default {
+  data() {
+    return {
+      login: '',
+      password: '',
+    };
+  },
+  methods: {
+    ...mapActions({
+      loginUser(dispatch) {
+        dispatch('auth/login', {
+          login: this.login,
+          password: this.password,
+        });
+      },
+    }),
+  },
+};
 </script>
 
 <style lang="scss" scoped>

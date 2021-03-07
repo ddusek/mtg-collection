@@ -7,7 +7,7 @@ axios.defaults.xsrfHeaderName = 'X-CSRFTOKEN';
 
 const register = async (data) => {
     return axios
-        .post(`${APIURL}/register`, data, { credentials: 'include' })
+        .post(`${APIURL}/register`, data)
         .then((response) => {
             return response.status == 200;
         })

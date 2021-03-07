@@ -3,7 +3,7 @@
     <div class="container">
       <h2>Already logged in</h2>
       <div class="form__input form__submit">
-        <button v-on:click="logout" type="submit" class="form__submit__button">Log out</button>
+        <button class="form__submit__button" v-on:click="logout">Log out</button>
       </div>
     </div>
   </div>

@@ -46,6 +46,9 @@ class Authenticator:
         except HashingError as err:
             logger.exception(err)
 
+    def _create_token(self, size: int):
+        return b64encode(urandom(size)).decode("utf-8")
+
     def register_user(self, username: str, password: str, email: str) -> dict:
         """Register a new user.
 
@@ -71,7 +74,7 @@ class Authenticator:
         if exists > 0:
             return (False, "Username or email already registered.")
         try:
-            token = b64encode(urandom(128)).decode("utf-8")
+            token = self._create_token(128)
 
             _id = self._mongo_db.users.insert_one(
                 {
@@ -102,14 +105,20 @@ class Authenticator:
             if self._is_email(login)
             else self._mongo_db.users.find_one({"username": login})
         )
-
+        if user is None:
+            return {"success": False, "user": 0, "error": "Failed to verify user."}
         try:
-            if self._pwd_hasher.verify(user.password, password):
+            if self._pwd_hasher.verify(user["password"], password):
                 # If user was verified, rehash password if it's needed.
-                if self._pwd_hasher.check_needs_rehash(user.password):
+                if self._pwd_hasher.check_needs_rehash(user["password"]):
                     self._rehash_password(user, password)
-                return {"success": True, "user": user._id, "error": ""}
-            return {"success": False, "user": 0, "error": "Failed to verify password."}
+
+                token = self._create_token(128)
+                self._mongo_db.users.update_one(
+                    {"_id": ObjectId(user["_id"])}, {"$push": {"tokens": token}}
+                )
+                return {"success": True, "id": str(user["_id"]), "token": token}
+            return {"success": False, "user": 0, "error": "Failed to verify user."}
 
         except (VerificationError, VerifyMismatchError) as err:
             logger.info(err)
@@ -124,7 +133,6 @@ class Authenticator:
         :return: {success: bool, user: userID, error: str}.
         :rtype: dict
         """
-        print(token, ObjectId(user_id))
         user = self._mongo_db.users.update_one(
             {"_id": ObjectId(user_id)}, {"$pull": {"tokens": token}}
         )

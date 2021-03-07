@@ -19,7 +19,7 @@ const actions = {
         commit('setUserID', payload);
     },
     async login({ commit }, payload) {
-        let data = await api.login(payload.username, payload.password);
+        let data = await api.login(payload);
         if (data !== null && data.success === true) {
             commit('setLoggedIn', true);
             commit('setUsername', data.username);

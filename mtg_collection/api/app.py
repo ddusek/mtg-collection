@@ -2,6 +2,7 @@ import json
 import urllib.parse
 from redis import Redis
 from pymongo import MongoClient
+from json.decoder import JSONDecodeError
 from starlette.applications import Starlette
 from starlette.routing import Route, Mount
 from starlette.responses import JSONResponse
@@ -46,7 +47,21 @@ async def login(request: Request) -> JSONResponse:
     :return: {"success": bool}.
     :rtype: JSONResponse
     """
-    pass
+    try:
+        params = await request.json()
+        auth = Authenticator(MONGO)
+        try:
+            user_info = auth.login_user(params["login"], params["password"])
+            if user_info["success"]:
+                response = JSONResponse(user_info)
+                response.set_cookie("user_token", str(user_info["token"]))
+                response.set_cookie("user_id", str(user_info["id"]))
+                return response
+            return JSONResponse({"success": False})
+        except ValueError as err:
+            logger.exception(err)
+    except JSONDecodeError as err:
+        logger.exception(err)
 
 
 async def logout(request: Request) -> JSONResponse:
