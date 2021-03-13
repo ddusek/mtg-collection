@@ -18,7 +18,21 @@
 </template>
 
 <script>
-export default {};
+import { mapActions } from 'vuex';
+export default {
+  methods: {
+    ...mapActions({
+      setUserState(dispatch) {
+        dispatch('user/setStatesFromCookie');
+      },
+    }),
+  },
+  mounted() {
+    if (!this.$store.state.user.statesSet) {
+      this.setUserState();
+    }
+  },
+};
 </script>
 
 <style lang="scss">

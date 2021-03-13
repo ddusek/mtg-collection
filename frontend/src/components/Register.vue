@@ -60,7 +60,7 @@ export default {
   methods: {
     ...mapActions({
       register(dispatch) {
-        dispatch('auth/register', {
+        dispatch('user/register', {
           username: this.username,
           password: this.password,
           email: this.email,

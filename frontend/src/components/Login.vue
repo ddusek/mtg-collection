@@ -41,7 +41,7 @@ export default {
   methods: {
     ...mapActions({
       loginUser(dispatch) {
-        dispatch('auth/login', {
+        dispatch('user/login', {
           login: this.login,
           password: this.password,
         });

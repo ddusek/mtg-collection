@@ -9,7 +9,7 @@ const register = async (data) => {
     return axios
         .post(`${APIURL}/register`, data)
         .then((response) => {
-            return response.status == 200;
+            return response.data;
         })
         .catch((error) => {
             console.log(error);
@@ -21,7 +21,7 @@ const login = async (data) => {
     return axios
         .post(`${APIURL}/login`, data)
         .then((response) => {
-            return response.status == 200;
+            return response.data;
         })
         .catch((error) => {
             console.log(error);
@@ -33,7 +33,7 @@ const logout = async () => {
     return axios
         .post(`${APIURL}/logout`)
         .then((response) => {
-            return response.status == 200;
+            return response.data;
         })
         .catch((error) => {
             console.log(error);

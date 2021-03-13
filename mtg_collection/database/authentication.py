@@ -86,7 +86,7 @@ class Authenticator:
                     "tokens": [token],
                 }
             ).inserted_id
-            return {"success": True, "token": token, "id": _id}
+            return {"success": True, "token": token, "id": _id, "username": username}
         except HashingError as err:
             logger.exception(err)
 
@@ -117,7 +117,12 @@ class Authenticator:
                 self._mongo_db.users.update_one(
                     {"_id": ObjectId(user["_id"])}, {"$push": {"tokens": token}}
                 )
-                return {"success": True, "id": str(user["_id"]), "token": token}
+                return {
+                    "success": True,
+                    "id": str(user["_id"]),
+                    "token": token,
+                    "username": user["username"],
+                }
             return {"success": False, "user": 0, "error": "Failed to verify user."}
 
         except (VerificationError, VerifyMismatchError) as err:

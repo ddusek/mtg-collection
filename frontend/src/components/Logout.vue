@@ -18,7 +18,7 @@ export default {
   methods: {
     ...mapActions({
       logout(dispatch) {
-        dispatch('auth/logout');
+        dispatch('user/logout');
       },
     }),
   },

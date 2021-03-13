@@ -35,8 +35,15 @@ async def register(request: Request) -> JSONResponse:
             response = JSONResponse({"success": True})
             response.set_cookie("user_token", str(user_info["token"]))
             response.set_cookie("user_id", str(user_info["id"]))
+            response.set_cookie("username", str(user_info["username"]))
             return response
-        return JSONResponse({"success": False})
+        return JSONResponse(
+            {
+                "success": False,
+                "username": user_info["username"],
+                "userID": user_info["id"],
+            }
+        )
     except ValueError as err:
         logger.exception(err)
 
@@ -56,8 +63,15 @@ async def login(request: Request) -> JSONResponse:
                 response = JSONResponse(user_info)
                 response.set_cookie("user_token", str(user_info["token"]))
                 response.set_cookie("user_id", str(user_info["id"]))
+                response.set_cookie("username", str(user_info["username"]))
                 return response
-            return JSONResponse({"success": False})
+            return JSONResponse(
+                {
+                    "success": False,
+                    "username": user_info["username"],
+                    "userID": user_info["id"],
+                }
+            )
         except ValueError as err:
             logger.exception(err)
     except JSONDecodeError as err:
@@ -81,6 +95,7 @@ async def logout(request: Request) -> JSONResponse:
         response = JSONResponse(logout_info)
         response.delete_cookie("user_token")
         response.delete_cookie("user_id")
+        response.delete_cookie("username")
         return response
 
     return JSONResponse(response)

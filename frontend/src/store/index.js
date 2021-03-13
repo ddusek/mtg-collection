@@ -3,7 +3,7 @@ import Vuex from 'vuex';
 import suggest from './modules/suggest';
 import card from './modules/card';
 import collection from './modules/collection';
-import auth from './modules/authentication';
+import user from './modules/user';
 
 Vue.use(Vuex);
 
@@ -12,6 +12,6 @@ export default new Vuex.Store({
         suggest,
         card,
         collection,
-        auth,
+        user,
     },
 });

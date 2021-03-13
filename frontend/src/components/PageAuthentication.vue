@@ -1,8 +1,8 @@
 <template>
   <div class="auth">
-    <Login />
-    <Register />
-    <Logout />
+    <Login v-if="!$store.state.user.loggedIn" />
+    <Register v-if="!$store.state.user.loggedIn" />
+    <Logout v-if="$store.state.user.loggedIn" />
   </div>
 </template>
 
@@ -10,6 +10,7 @@
 import Login from './Login';
 import Register from './Register';
 import Logout from './Logout';
+
 export default {
   components: { Login, Register, Logout },
 };

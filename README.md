@@ -28,4 +28,4 @@ Database contains all users, and their collections with cards.
 
 Database currently contains all cards, all sets and all created collections.
 
-![Image](docs/redis-diagram.svg "mongo diagram")
+![Image](docs/redis-diagram.svg "redis diagram")
