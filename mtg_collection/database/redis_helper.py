@@ -90,17 +90,24 @@ def get_suggestions(redis: "Redis", text: str, limit: int = 0) -> list[str]:
         logger.exception(err)
 
 
-def get_set_keys(redis: "Redis", set_name: str) -> list[str]:
+def get_set_keys(redis: "Redis", set_name: str, prefix: str = None) -> list[str]:
     """Get all keys in given set.
 
     :param redis: Redis instance.
     :type redis: Redis
     :param set_name: Name of set.
     :type set_name: str
+    :param prefix: Prefix by which to filter keys.
+    :type prefix: str
     :return: List of keys.
     :rtype: list[str]
     """
-    return redis.smembers(set_name)
+    prefix_bytes = f"{prefix}:".encode()
+    keys = redis.smembers(set_name)
+    print(keys)
+    if prefix:
+        keys = [k.removeprefix(prefix_bytes) for k in keys if prefix_bytes in k]
+    return keys
 
 
 def get_all_editions(redis: "Redis") -> list[str]:
@@ -114,15 +121,17 @@ def get_all_editions(redis: "Redis") -> list[str]:
     return get_set_keys(redis, "editions")
 
 
-def get_all_collections(redis: "Redis") -> list[str]:
+def get_all_collections(redis: "Redis", user: str) -> list[str]:
     """Get all collections from database.
 
     :param redis: Redis instance.
     :type redis: Redis
+    :param user: Username of user whose collections to get.
+    :type user: str
     :return: List of keys.
     :rtype: list[str]
     """
-    return get_set_keys(redis, "collections")
+    return get_set_keys(redis, "collections", user)
 
 
 def get_collection(redis: "Redis", name: str) -> list[str]:
@@ -135,17 +144,22 @@ def get_collection(redis: "Redis", name: str) -> list[str]:
     :return: List of keys.
     :rtype: list[str]
     """
+    print(name)
+    print(f"collection:{name}:*")
     keys = _get_matches(redis, f"collection:{name}:*")
+    print(keys)
     return redis.mget(keys)
 
 
 def add_card_to_redis(
-    redis: "Redis", collection: str, card: str, edition: str, units: int
+    redis: "Redis", user: str, collection: str, card: str, edition: str, units: int
 ) -> object:
     """Add card and to a collection.
 
     :param redis: Redis instance.
     :type redis: Redis
+    :param user: User to whom to add card.
+    :type user: str
     :param collection: Collection where to add card.
     :type collection: str
     :param card: Card to add.
@@ -157,13 +171,15 @@ def add_card_to_redis(
     :return: {"success": bool}
     :rtype: object
     """
-    if collection is None:
+    if not user:
+        raise ValueError("cannot add card, user part is None")
+    if not collection:
         raise ValueError("cannot add card, collection part is None")
-    if card is None:
+    if not card:
         raise ValueError("cannot add card, card part is None")
-    if units is None:
+    if not units:
         raise ValueError("cannot add card, units part is None")
-    key = f"collection:{collection}:{card}:{units}"
+    key = f"collection:{user}:{collection}:{card}:{units}"
     value = redis.get(f"card:{edition}:{card}")
     if value is None:
         raise ValueError(
@@ -174,19 +190,21 @@ def add_card_to_redis(
     return {"success": redis.set(key, value) if value else False}
 
 
-def add_collection_to_redis(redis: "Redis", collection: str) -> object:
+def add_collection_to_redis(redis: "Redis", collection: str, user: str) -> object:
     """Add new empty collection.
 
     If collection is already in set, it gets rewritten so basically nothing happens.
 
-    :param redis: [description]
+    :param redis: Redis instance.
     :type redis: Redis
-    :param collection: [description]
+    :param collection: Name of collection.
     :type collection: str
+    :param user: Username.
+    :type user: str
     :return: {"success": bool}.
     :rtype: object
     """
-    return {"success": redis.sadd("collections", collection)}
+    return {"success": redis.sadd("collections", f"{user}:{collection}")}
 
 
 def format_cards(cards_data: list[str]) -> list[str]:

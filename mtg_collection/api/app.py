@@ -1,8 +1,8 @@
 import json
 import urllib.parse
+from json.decoder import JSONDecodeError
 from redis import Redis
 from pymongo import MongoClient
-from json.decoder import JSONDecodeError
 from starlette.applications import Starlette
 from starlette.routing import Route, Mount
 from starlette.responses import JSONResponse
@@ -13,6 +13,7 @@ from starlette.middleware.sessions import SessionMiddleware
 from mtg_collection import constants
 from mtg_collection.api import logger
 from mtg_collection.database import redis_helper
+from mtg_collection.database import mongo_helper
 from mtg_collection.database.download import Downloader
 from mtg_collection.database.synchronize import Synchronizer
 from mtg_collection.database.authentication import Authenticator
@@ -145,8 +146,9 @@ async def collections(request: Request) -> JSONResponse:
     :return: List of collections.
     :rtype: JSONResponse
     """
+    username = request.cookies.get('username')
     try:
-        data = redis_helper.get_all_collections(REDIS)
+        data = redis_helper.get_all_collections(REDIS, username)
         data_decoded = [byte.decode("utf-8") for byte in data]
         result = redis_helper.format_set_dropdown(data_decoded)
         return JSONResponse(result)
@@ -162,9 +164,11 @@ async def collection(request: Request) -> JSONResponse:
     :return: List of card objects.
     :rtype: JSONResponse
     """
-    name = request.path_params["name"]
+    username = request.cookies.get('username')
+    collection = request.path_params["name"]
+    key = f"{username}:{collection}"
     try:
-        data = redis_helper.get_collection(REDIS, name)
+        data = redis_helper.get_collection(REDIS, key)
         data_decoded = [json.loads(byte.decode("utf-8")) for byte in data]
 
         result = []
@@ -195,9 +199,20 @@ async def add_card(request: Request) -> JSONResponse:
     card = request.path_params["card"]
     edition = request.path_params["edition"]
     units = request.path_params["units"]
+    username = request.cookies.get('username')
+    if not username:
+        err = 'username not saved in cookie'
+        logger.exception(err)
+        raise ValueError(err)
     try:
-        result = redis_helper.add_card_to_redis(REDIS, collection, card, edition, units)
-        return JSONResponse(result)
+        result_redis = redis_helper.add_card_to_redis(
+            REDIS, username, collection, card, edition, units
+        )
+        result_mongo = mongo_helper.add_card_to_mongo(
+            MONGO, username, collection, card, edition, units
+        )
+        result = result_redis['success'] and result_mongo['success']
+        return JSONResponse({'success': result})
     except ValueError as err:
         logger.exception(err)
     except (ConnectionError, TimeoutError) as err:
@@ -234,9 +249,16 @@ async def add_collection(request: Request) -> JSONResponse:
     :rtype: JSONResponse
     """
     collection = request.path_params["collection"]
+    username = request.cookies.get("username")
+    if not username:
+        err = 'username not saved in cookies'
+        logger.exception(err)
+        raise ValueError(err)
     try:
-        result = redis_helper.add_collection_to_redis(REDIS, collection)
-        return JSONResponse(result)
+        result_redis = redis_helper.add_collection_to_redis(REDIS, collection, username)
+        result_mongo = mongo_helper.add_collection_to_mongo(MONGO, collection, username)
+        result = result_redis["success"] and result_mongo["success"]
+        return JSONResponse({"success": result, "message": result_mongo["message"]})
     except (ConnectionError, TimeoutError) as err:
         logger.exception("cannot connect to Redis. %s", err)
 
@@ -314,10 +336,11 @@ routes = [
 # Start api.
 app = Starlette(debug=True, middleware=middlewares, routes=routes)
 
-# Connect to databases.
+# Connect to Redis.
 REDIS = Redis(
     host=constants.REDIS_HOSTNAME, port=constants.REDIS_PORT, db=constants.REDIS_MAIN_DB
 )
+# Connect to MongoDB.
 MONGO = MongoClient(
     "mongodb://%s:%s@%s"
     % (

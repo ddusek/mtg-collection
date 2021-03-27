@@ -84,6 +84,7 @@ class Authenticator:
                     "created": datetime.now(),
                     "last_login": datetime.now(),
                     "tokens": [token],
+                    "collections": {},
                 }
             ).inserted_id
             return {"success": True, "token": token, "id": _id, "username": username}
