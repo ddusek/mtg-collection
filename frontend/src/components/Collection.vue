@@ -5,6 +5,7 @@
       @change="getCollectionCards"
       name="collection"
       id="collection"
+      class="dropdown"
     >
       <option v-for="collection in collections" :key="collection.key" :value="collection.name">
         {{ collection.name }}
@@ -14,25 +15,29 @@
       <table v-if="hasCards">
         <thead>
           <tr>
-            <th>Card name</th>
-            <th>Set</th>
-            <th>Price</th>
-            <th>Price foil</th>
-            <th>Release</th>
+            <th class="collection__header-col">Card name</th>
+            <th class="collection__header-col">Set</th>
+            <th class="collection__header-col">Units</th>
+            <th class="collection__header-col">Price</th>
+            <th class="collection__header-col">Price foil</th>
+            <th class="collection__header-col">Price total</th>
+            <th class="collection__header-col">Release</th>
           </tr>
         </thead>
         <tfoot>
           <tr>
-            <td colspan="2">total</td>
-            <td colspan="3">9999</td>
+            <td colspan="3">total</td>
+            <td colspan="4">9999</td>
           </tr>
         </tfoot>
         <tbody>
           <tr v-for="card in collectionCards" :key="card.id">
             <td>{{ card.name }}</td>
             <td>{{ card.edition }}</td>
+            <td>{{ card.units }}</td>
             <td>{{ card.price }}</td>
             <td>{{ card.price_foil }}</td>
+            <td>{{ card.price * card.units }}</td>
             <td>{{ card.release }}</td>
           </tr>
         </tbody>
@@ -90,6 +95,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import '../styles/_variables';
+
 .collection {
   table {
     border: 1px solid black;
@@ -106,6 +113,24 @@ export default {
   }
   tr:nth-child(odd) {
     background: hsl(0, 0%, 40%);
+  }
+
+  .dropdown {
+    height: 50px;
+    margin-bottom: 10px;
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    height: 30px;
+    width: 250px;
+    border-radius: 5px;
+    padding: 0 0 0 5px;
+    background-color: #ffffff;
+  }
+
+  &__header-col {
+    background-color: $highlight-color;
   }
 }
 </style>

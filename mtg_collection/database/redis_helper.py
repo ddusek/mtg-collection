@@ -1,3 +1,4 @@
+import json
 from mtg_collection.database import logger
 
 
@@ -176,11 +177,16 @@ def add_card_to_redis(
         raise ValueError("cannot add card, card part is None")
     if not units:
         raise ValueError("cannot add card, units part is None")
-    key = f"collection:{user}:{collection}:{card}:{units}"
-    matched = _get_matches(redis, f"collection:{user}:{collection}:{card}:*")
+    key = f"collection:{user}:{collection}:{card}"
+    matched = _get_matches(redis, key)
     if len(matched) > 0:
         return {"success": False, "message": "Card already exists."}
+
     value = redis.get(f"card:{edition}:{card}")
+    value_dict = json.loads(value.decode("utf-8"))
+    value_dict["units"] = units
+    print(value_dict)
+    value = str.encode(json.dumps(value_dict), "utf-8")
     if value is None:
         raise ValueError(
             "cannot add card, its value was not found by card key",
