@@ -144,10 +144,7 @@ def get_collection(redis: "Redis", name: str) -> list[str]:
     :return: List of keys.
     :rtype: list[str]
     """
-    print(name)
-    print(f"collection:{name}:*")
     keys = _get_matches(redis, f"collection:{name}:*")
-    print(keys)
     return redis.mget(keys)
 
 
@@ -180,6 +177,9 @@ def add_card_to_redis(
     if not units:
         raise ValueError("cannot add card, units part is None")
     key = f"collection:{user}:{collection}:{card}:{units}"
+    matched = _get_matches(redis, f"collection:{user}:{collection}:{card}:*")
+    if len(matched) > 0:
+        return {"success": False, "message": "Card already exists."}
     value = redis.get(f"card:{edition}:{card}")
     if value is None:
         raise ValueError(

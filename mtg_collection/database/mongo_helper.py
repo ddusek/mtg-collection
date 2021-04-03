@@ -24,10 +24,8 @@ def add_card_to_mongo(
     collection_key = f"collections.{collection}"
     exists = mongo.users.count_documents(
         {
-            "$and": [
-                {"username": user},
-                {collection_key: {"$elemMatch": {"name": card, "edition": edition}}},
-            ]
+            "username": user,
+            collection_key: {"$elemMatch": {"card": card, "edition": edition}},
         },
         limit=1,
     )
